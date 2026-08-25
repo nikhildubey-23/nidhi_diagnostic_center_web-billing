@@ -43,6 +43,11 @@ def _get_redis_client(app):
 
 def init_session(app):
     """Configure Flask-Session with Redis or filesystem fallback."""
+    # Vercel serverless: skip file-based sessions entirely
+    if os.environ.get("VERCEL"):
+        app.logger.info("Flask-Session: Skipping (Vercel serverless)")
+        return
+
     session_type = app.config.get("SESSION_TYPE", "filesystem")
 
     if session_type == "redis":
@@ -57,7 +62,7 @@ def init_session(app):
             except Exception as e:
                 app.logger.warning(f"Redis session init failed: {e}")
 
-    # Fallback: try filesystem sessions; skip if read-only (Vercel)
+    # Fallback: try filesystem sessions; skip if read-only
     app.config["SESSION_TYPE"] = "filesystem"
     upload_folder = app.config.get("UPLOAD_FOLDER", "uploads")
     app.config["SESSION_FILE_DIR"] = os.path.join(upload_folder, "sessions")
@@ -77,16 +82,22 @@ def init_session(app):
 
 
 def init_rate_limiter(app):
-    """Configure rate limiter — try Redis, fall back to memory."""
-    storage_uri = app.config.get("RATELIMIT_STORAGE_URI", "memory://")
+    """Configure rate limiter — memory on Vercel, Redis elsewhere."""
+    # Vercel serverless: always use memory (no persistent Redis connection)
+    if os.environ.get("VERCEL"):
+        app.config["RATELIMIT_STORAGE_URI"] = "memory://"
+        app.logger.info("Rate limiter: Using memory (Vercel)")
+        return
 
+    # Non-Vercel: try Redis if configured
+    storage_uri = app.config.get("RATELIMIT_STORAGE_URI", "memory://")
     if storage_uri != "memory://":
         r = _get_redis_client(app)
         if r is not None:
             try:
                 r.ping()
                 app.config["RATELIMIT_STORAGE_URI"] = storage_uri
-                app.logger.info(f"Rate limiter: Using Redis")
+                app.logger.info("Rate limiter: Using Redis")
                 return
             except Exception as e:
                 app.logger.warning(f"Rate limiter Redis failed: {e}, falling back to memory")
