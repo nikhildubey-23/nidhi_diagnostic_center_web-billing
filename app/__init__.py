@@ -10,23 +10,34 @@ from app.config import BASE_DIR, config_by_name
 
 
 def _configure_logging(app: Flask):
-    log_dir = Path(BASE_DIR) / "logs"
-    log_dir.mkdir(exist_ok=True)
+    root = app.logger
+    root.setLevel(logging.DEBUG if app.debug else logging.INFO)
+    if app.config.get("TESTING"):
+        root.setLevel(logging.WARNING)
+        return
+
     fmt = logging.Formatter(
         "%(asctime)s %(levelname)s %(name)s :: %(message)s"
     )
+
+    # Vercel / serverless: read-only filesystem — skip file logging
+    log_dir = Path(BASE_DIR) / "logs"
+    try:
+        log_dir.mkdir(exist_ok=True)
+        test_file = log_dir / ".write_test"
+        test_file.write_text("")
+        test_file.unlink()
+    except OSError:
+        # Console-only logging (Vercel, read-only envs)
+        return
+
     file_handler = RotatingFileHandler(
         log_dir / "app.log", maxBytes=2_000_000, backupCount=5
     )
     file_handler.setFormatter(fmt)
     file_handler.setLevel(logging.INFO)
-
-    root = app.logger
-    root.setLevel(logging.DEBUG if app.debug else logging.INFO)
     if not root.handlers:
         root.addHandler(file_handler)
-    if app.config.get("TESTING"):
-        root.setLevel(logging.WARNING)
 
 
 def create_app(config_name: str | None = None) -> Flask:

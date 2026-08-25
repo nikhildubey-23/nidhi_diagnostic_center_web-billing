@@ -1,5 +1,6 @@
 """Flask extension instances (single import point to avoid cycles)."""
 import os
+from pathlib import Path
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -56,13 +57,20 @@ def init_session(app):
             except Exception as e:
                 app.logger.warning(f"Redis session init failed: {e}")
 
-    # Fallback: filesystem sessions
+    # Fallback: try filesystem sessions; skip if read-only (Vercel)
     app.config["SESSION_TYPE"] = "filesystem"
     upload_folder = app.config.get("UPLOAD_FOLDER", "uploads")
     app.config["SESSION_FILE_DIR"] = os.path.join(upload_folder, "sessions")
     try:
+        session_dir = Path(app.config["SESSION_FILE_DIR"])
+        session_dir.mkdir(parents=True, exist_ok=True)
+        test_file = session_dir / ".write_test"
+        test_file.write_text("")
+        test_file.unlink()
         from flask_session import Session
         Session(app)
         app.logger.info("Flask-Session: Using filesystem")
+    except OSError:
+        app.logger.warning("Flask-Session: Read-only filesystem, skipping file sessions")
     except Exception:
         pass
