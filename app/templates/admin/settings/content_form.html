@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if row else 'New' }} Content — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">{{ 'Edit Content: ' ~ (row.title or row.key) if row else 'New Content Block' }}</h1>
+
+<form method="post" class="card mt-6 max-w-2xl space-y-4 p-6" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div>
+    <label class="label">Key * (e.g. about_intro, home_hero_title)</label>
+    {{ form.key(class="input", placeholder="about_intro") }}
+  </div>
+  <div>
+    <label class="label">Title</label>
+    {{ form.title(class="input") }}
+  </div>
+  <div>
+    <label class="label">Body / Content *</label>
+    {{ form.body(class="input", rows=6, placeholder="Content text... Use | to separate list items for 'Why Choose Us'.") }}
+  </div>
+  <label class="flex items-center gap-2 text-sm">{{ form.is_active() }} {{ form.is_active.label.text }}</label>
+  <div class="flex gap-3">
+    <button type="submit" class="btn-primary">Save</button>
+    <a href="{{ url_for('settings.content') }}" class="btn-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

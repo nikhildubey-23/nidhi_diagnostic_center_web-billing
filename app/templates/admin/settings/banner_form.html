@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if is_edit else 'New' }} Banner — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">{{ 'Edit Banner' if is_edit else 'New Banner' }}</h1>
+
+<form method="post" enctype="multipart/form-data" class="card mt-6 max-w-2xl space-y-4 p-6" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if banner and banner.image_path %}
+  <div>
+    <p class="label">Current Image</p>
+    <img src="{{ url_for('static', filename=banner.image_path) }}" class="mt-1 h-32 rounded-lg object-cover">
+  </div>
+  {% endif %}
+  <div>
+    <label class="label">Image {{ '' if is_edit else '*' }} (JPG/PNG, max 5 MB, recommended 1600x600)</label>
+    {{ form.image(class="mt-1 block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700", accept=".jpg,.jpeg,.png") }}
+  </div>
+  <div>
+    <label class="label">Title (alt text)</label>
+    {{ form.title(class="input") }}
+  </div>
+  <div>
+    <label class="label">Link URL (optional)</label>
+    {{ form.link_url(class="input", placeholder="/services") }}
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="label">Sort Order</label>
+      {{ form.sort_order(class="input", type="number", min=0) }}
+    </div>
+    <label class="mt-6 flex items-center gap-2 text-sm">{{ form.is_active() }} {{ form.is_active.label.text }}</label>
+  </div>
+  <div class="flex gap-3">
+    <button type="submit" class="btn-primary">{{ 'Save' if is_edit else 'Upload Banner' }}</button>
+    <a href="{{ url_for('settings.banners') }}" class="btn-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

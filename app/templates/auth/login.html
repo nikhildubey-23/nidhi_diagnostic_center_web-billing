@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Staff Login — {{ center_name() }}{% endblock %}
+{% block body %}
+<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 px-4">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
+    <div class="text-center">
+      <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100">
+        <svg class="h-7 w-7 text-brand-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+      </span>
+      <h1 class="mt-4 text-xl font-bold text-slate-900">Staff Login</h1>
+      <p class="text-sm text-slate-500">{{ center_name() }}</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="mt-4 rounded-lg border px-3 py-2 text-sm
+          {% if category == 'danger' %}border-red-200 bg-red-50 text-red-700
+          {% elif category == 'warning' %}border-amber-200 bg-amber-50 text-amber-700
+          {% else %}border-brand-200 bg-brand-50 text-brand-700{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" class="mt-5 space-y-4" novalidate>
+      {{ form.hidden_tag() }}
+      <div>
+        <label class="label" for="username">{{ form.username.label.text }}</label>
+        {{ form.username(class="input", placeholder="your username", autofocus=true, autocomplete="username") }}
+        {% for e in form.username.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label class="label" for="password">{{ form.password.label.text }}</label>
+        {{ form.password(class="input", placeholder="password", autocomplete="current-password") }}
+        {% for e in form.password.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn-primary w-full py-2.5">Log In</button>
+    </form>
+    <p class="mt-4 text-center text-xs text-slate-400">Authorized staff only.</p>
+  </div>
+</div>
+{% endblock %}

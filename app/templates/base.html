@@ -1,0 +1,19 @@
+{# Minimal head/base for all pages #}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ center_name() }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ center_name() }} — {{ get_setting('tagline') }} Diagnostic centre in Sarkanda, Bilaspur (Chhattisgarh). Sonography, X-Ray, CT Scan & Pathology.{% endblock %}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9877;</text></svg>">
+</head>
+<body class="min-h-full bg-slate-50 font-sans text-slate-800 antialiased">
+{% block body %}{% endblock %}
+  <style>[x-cloak]{display:none!important}</style>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/alpine.min.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

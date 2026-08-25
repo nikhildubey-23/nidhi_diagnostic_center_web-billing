@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit Patient' if patient else 'New Patient' }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">{{ 'Edit Patient: ' ~ patient.full_name if patient else 'Register New Patient' }}</h1>
+{% if patient %}<p class="text-sm text-slate-500">Patient Code: <span class="font-mono">{{ patient.patient_code }}</span></p>{% endif %}
+
+<form method="post" class="card mt-6 grid max-w-3xl gap-4 p-6 sm:grid-cols-2" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="sm:col-span-2">
+    <label class="label">{{ form.full_name.label.text }} *</label>
+    {{ form.full_name(class="input") }}
+  </div>
+  <div>
+    <label class="label">{{ form.mobile.label.text }} *</label>
+    {{ form.mobile(class="input", inputmode="numeric") }}
+  </div>
+  <div>
+    <label class="label">{{ form.email.label.text }}</label>
+    {{ form.email(class="input") }}
+  </div>
+  <div>
+    <label class="label">{{ form.date_of_birth.label.text }}</label>
+    {{ form.date_of_birth(class="input", type="date") }}
+  </div>
+  <div>
+    <label class="label">{{ form.age.label.text }}</label>
+    {{ form.age(class="input", type="number", min=0, max=120) }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">{{ form.gender.label.text }} *</label>
+    <div class="mt-1 flex gap-4">
+      {% for sub in form.gender %}
+      <label class="flex items-center gap-2 text-sm">{{ sub }} {{ sub.label.text }}</label>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">{{ form.address.label.text }}</label>
+    {{ form.address(class="input", rows=2) }}
+  </div>
+  <div>
+    <label class="label">{{ form.emergency_contact.label.text }}</label>
+    {{ form.emergency_contact(class="input") }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">{{ form.medical_notes.label.text }}</label>
+    {{ form.medical_notes(class="input", rows=3) }}
+  </div>
+  <div class="flex gap-3 sm:col-span-2">
+    <button type="submit" class="btn-primary">{{ 'Save Changes' if patient else 'Register Patient' }}</button>
+    {% if patient %}<a href="{{ url_for('patients.profile', patient_id=patient.id) }}" class="btn-secondary">Cancel</a>{% endif %}
+  </div>
+</form>
+{% endblock %}

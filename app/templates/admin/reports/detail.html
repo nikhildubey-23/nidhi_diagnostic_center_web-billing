@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ report.title }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <nav class="text-xs text-slate-400"><a href="{{ url_for('reports.index') }}" class="hover:text-brand-600">Reports</a> / {{ report.title }}</nav>
+    <h1 class="mt-1 text-xl font-bold text-slate-900">{{ report.title }}
+      <span class="badge ml-2 {{ 'bg-emerald-50 text-emerald-700' if report.status == 'completed' else 'bg-amber-50 text-amber-700' }}">{{ report.status|capitalize }}</span>
+    </h1>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{{ url_for('reports.view_file', report_id=report.id) }}" target="_blank" class="btn-secondary text-sm">&#128065; View</a>
+    <a href="{{ url_for('reports.download', report_id=report.id) }}" class="btn-primary text-sm">&#11015; Download</a>
+    {% if report.status != 'completed' %}
+    <form method="post" action="{{ url_for('reports.mark_completed', report_id=report.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm">&#10003; Mark Completed &amp; Notify</button>
+    </form>
+    {% endif %}
+    <form method="post" action="{{ url_for('reports.delete', report_id=report.id) }}"
+          onsubmit="return confirm('Delete this report permanently?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn-danger text-sm">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-3">
+  <div class="card p-6 lg:col-span-2">
+    <h2 class="text-sm font-bold text-slate-800">Details</h2>
+    <dl class="mt-4 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+      <div><dt class="text-slate-500">Patient</dt><dd><a href="{{ url_for('patients.profile', patient_id=report.patient_id) }}" class="font-semibold text-brand-800 hover:underline">{{ report.patient.full_name }} ({{ report.patient.patient_code }})</a></dd></div>
+      <div><dt class="text-slate-500">Service</dt><dd>{{ report.service.name if report.service else '—' }}</dd></div>
+      {% if report.booking %}<div><dt class="text-slate-500">Booking</dt><dd>{{ report.booking.booking_code }}</dd></div>{% endif %}
+      <div><dt class="text-slate-500">Report Date</dt><dd>{{ fmt_date(report.report_date) }}</dd></div>
+      {% if report.doctor_name %}<div><dt class="text-slate-500">Reporting Doctor</dt><dd>{{ report.doctor_name }}</dd></div>{% endif %}
+      <div><dt class="text-slate-500">Uploaded</dt><dd>{{ fmt_datetime(report.created_at) }}</dd></div>
+      <div><dt class="text-slate-500">File</dt><dd class="truncate">{{ report.file_original_name or report.file_path.split('/')[-1] }}</dd></div>
+    </dl>
+    {% if report.notes %}
+    <hr class="my-4"><p class="text-[11px] font-bold uppercase text-slate-400">Notes</p>
+    <p class="mt-1 whitespace-pre-line text-sm">{{ report.notes }}</p>
+    {% endif %}
+  </div>
+
+  <div class="space-y-4">
+    <div class="card p-5">
+      <h3 class="text-sm font-bold text-slate-800">Replace File</h3>
+      <form method="post" enctype="multipart/form-data" action="{{ url_for('reports.replace_file', report_id=report.id) }}" class="mt-3 space-y-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" required
+               class="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-brand-700">
+        <button type="submit" class="btn-secondary w-full">Replace File</button>
+      </form>
+    </div>
+    <div class="card p-5 text-sm text-slate-500">
+      <h3 class="text-sm font-bold text-slate-800">Patient Notification</h3>
+      <p class="mt-2">{{ 'Email sent to ' ~ report.patient.email if report.patient.email else 'No email on file for this patient.' }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-6 overflow-hidden">
+  <iframe src="{{ url_for('reports.view_file', report_id=report.id) }}" class="h-[70vh] w-full"></iframe>
+</div>
+{% endblock %}

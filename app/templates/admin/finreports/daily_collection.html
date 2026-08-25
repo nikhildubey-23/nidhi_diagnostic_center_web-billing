@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% block title %}Daily Collection — {{ fmt_date(day) }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold text-slate-900">Daily Collection Register</h1>
+    <form method="get" class="mt-2 flex items-center gap-2">
+      <input type="date" name="date" value="{{ day.isoformat() }}" class="input w-40 text-sm">
+      <button class="btn-secondary text-sm">Go</button>
+    </form>
+  </div>
+  <div class="flex gap-2">
+    <a href="{{ url_for('finreports.index') }}" class="btn-secondary text-sm">&larr; Financial Reports</a>
+    <button onclick="window.print()" class="btn-primary text-sm no-print">&#128424; Print Register</button>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="mt-4 grid gap-4 sm:grid-cols-3">
+  <div class="card p-5 bg-emerald-50 border-emerald-200">
+    <p class="text-[11px] font-bold uppercase text-emerald-700">Total Collected on {{ fmt_date(day) }}</p>
+    <p class="text-2xl font-extrabold text-emerald-800">{{ inr(total) }}</p>
+  </div>
+  <div class="card p-5">
+    <p class="text-[11px] font-bold uppercase text-slate-500">Transactions</p>
+    <p class="text-2xl font-extrabold">{{ entries|length }}</p>
+  </div>
+  <div class="card p-5">
+    <p class="text-[11px] font-bold uppercase text-slate-500">By Method</p>
+    <ul class="mt-1 space-y-0.5 text-sm">
+      {% for method, amt in by_method.items() %}
+      <li class="flex justify-between"><span>{{ method }}</span><span class="font-mono">{{ inr(amt) }}</span></li>
+      {% else %}<li class="text-xs text-slate-400">No payments yet.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- Register table -->
+<div class="card mt-4 overflow-hidden" id="print-area">
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Time</th><th>Invoice #</th><th>Patient</th><th>Services</th><th>Invoice Amt</th><th>Paid (₹)</th><th>Method</th><th>Staff</th></tr></thead>
+      <tbody>
+        {% for e in entries %}
+        <tr class="hover:bg-slate-50 cursor-pointer" {% if e.invoice_id %}onclick="window.location='{{ url_for('invoices.view', invoice_id=e.invoice_id) }}'"{% endif %}>
+          <td class="whitespace-nowrap text-xs">{{ e.time }}</td>
+          <td class="font-mono text-xs">{{ e.invoice }}</td>
+          <td>{{ e.patient }}<span class="block text-[11px] text-slate-400">{{ e.patient_code }}</span></td>
+          <td class="max-w-48 truncate text-xs text-slate-500" title="{{ e.services }}">{{ e.services or '—' }}</td>
+          <td>{{ inr(e.invoice_amount) }}</td>
+          <td class="font-semibold text-emerald-700">{{ inr(e.paid_amount) }}</td>
+          <td><span class="badge bg-slate-100 text-slate-600">{{ e.method }}</span></td>
+          <td class="text-xs">{{ e.staff }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="px-4 py-8 text-center text-sm text-slate-400">No payments collected on this date.</td></tr>
+        {% endfor %}
+        {% if entries %}
+        <tr class="bg-slate-50 font-bold">
+          <td colspan="5" class="text-right uppercase text-xs">Total</td>
+          <td class="font-mono text-emerald-800">{{ inr(total) }}</td>
+          <td colspan="2"></td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

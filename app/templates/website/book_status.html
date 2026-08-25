@@ -1,0 +1,32 @@
+{% extends "website/base.html" %}
+{% block title %}Check Booking Status — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-xl px-4 py-14">
+  <h1 class="text-3xl font-extrabold text-slate-900">Check Booking Status</h1>
+  <p class="mt-2 text-slate-500">Enter your booking reference number (e.g. {{ get_setting('booking_prefix') }}-{{ current_year }}-000001).</p>
+
+  <form method="post" class="card mt-6 flex flex-col gap-3 p-6 sm:flex-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="text" name="code" value="{{ code }}" required
+           placeholder="{{ get_setting('booking_prefix') }}-..."
+           class="input flex-1 uppercase tracking-wider">
+    <button type="submit" class="btn-primary sm:w-auto">Check</button>
+  </form>
+
+  {% if booking %}
+  <div class="card mt-6 p-6">
+    <div class="flex items-center justify-between">
+      <p class="font-bold text-slate-900">{{ booking.booking_code }}</p>
+      {% set colors = {'pending': 'bg-amber-50 text-amber-700', 'confirmed': 'bg-emerald-50 text-emerald-700', 'arrived': 'bg-brand-50 text-brand-700', 'in_progress': 'bg-indigo-50 text-indigo-700', 'completed': 'bg-slate-100 text-slate-700', 'cancelled': 'bg-red-50 text-red-700', 'no_show': 'bg-red-50 text-red-700'} %}
+      <span class="badge {{ colors.get(booking.status, 'bg-slate-100 text-slate-600') }}">{{ booking.status_label }}</span>
+    </div>
+    <dl class="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+      <div><dt class="text-slate-500">Name</dt><dd>{{ booking.patient_name }}</dd></div>
+      <div><dt class="text-slate-500">Service</dt><dd>{{ booking.service.name }}</dd></div>
+      <div><dt class="text-slate-500">Date</dt><dd>{{ fmt_date(booking.preferred_date) }}</dd></div>
+      <div><dt class="text-slate-500">Time</dt><dd>{% if booking.preferred_time %}{{ booking.preferred_time.strftime('%I:%M %p') }}{% else %}—{% endif %}</dd></div>
+    </dl>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

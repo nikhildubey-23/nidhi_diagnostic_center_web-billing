@@ -1,0 +1,182 @@
+{% extends "admin/base.html" %}
+{% block title %}Create Invoice — {{ patient.patient_code if patient else '' }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <nav class="text-xs text-slate-400"><a href="{{ url_for('billing.counter') }}" class="hover:text-brand-600">Billing Counter</a> / Create Invoice</nav>
+    <h1 class="mt-1 text-xl font-bold text-slate-900">Create Invoice</h1>
+  </div>
+  {% if patient %}
+  <div class="flex gap-2">
+    <a href="{{ url_for('patients.profile', patient_id=patient.id) }}" class="btn-secondary text-sm">Patient Profile</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if not patient %}
+<div class="card mt-6 p-8 text-center text-slate-500">
+  <p>No patient selected. <a href="{{ url_for('billing.counter') }}" class="font-semibold text-brand-700 hover:underline">Go to Billing Counter to search or create a patient first.</a></p>
+</div>
+{% else %}
+<!-- Patient banner -->
+<div class="card mt-4 flex flex-wrap items-center justify-between gap-4 p-4">
+  <div class="flex items-center gap-4">
+    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-800 font-bold text-sm">{{ patient.patient_code.split('-')[-1][:2] }}</span>
+    <div>
+      <p class="font-bold text-slate-900">{{ patient.full_name }} <span class="text-xs text-slate-400">{{ patient.patient_code }}</span></p>
+      <p class="text-xs text-slate-500">{{ patient.mobile }} &middot; {{ patient.gender }} &middot; {{ patient.display_age }}</p>
+    </div>
+  </div>
+  {% if booking %}
+  <span class="badge bg-indigo-50 text-indigo-700">Linked Booking: {{ booking.booking_code }}</span>
+  {% endif %}
+</div>
+
+<form method="post" action="{{ url_for('billing.create_invoice') }}" class="mt-6" id="invoiceForm">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="patient_id" value="{{ patient.id }}">
+  {% if booking %}
+  <input type="hidden" name="booking_id" value="{{ booking.id }}">
+  {% endif %}
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- Services grid -->
+    <div class="lg:col-span-2 card overflow-hidden">
+      <div class="border-b bg-slate-50 px-5 py-3">
+        <h2 class="text-sm font-bold text-slate-800">Select Services &amp; Tests</h2>
+        <p class="text-xs text-slate-500">Set quantity for items to include. Prices come from the service catalogue.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table-base" id="svcTable">
+          <thead>
+            <tr>
+              <th class="w-8"></th>
+              <th>Service</th>
+              <th>Category</th>
+              <th>Rate (₹)</th>
+              <th>Qty</th>
+              <th>Discount (₹)</th>
+              <th>Tax %</th>
+              <th>Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for svc in services %}
+            <tr data-id="{{ svc.id }}" data-rate="{{ svc.price }}" data-tax="{{ svc.tax_percent or 0 }}" data-de="{{ 1 if svc.discount_eligible else 0 }}">
+              <td class="text-center">
+                <input type="hidden" name="add_{{ svc.id }}" value="">
+                <input type="checkbox" name="add_{{ svc.id }}" value="1"
+                       class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 svc-check"
+                       onchange="toggleRow(this)">
+              </td>
+              <td class="font-medium">{{ svc.name }} <span class="text-[10px] text-slate-400">{{ svc.code }}</span></td>
+              <td class="text-xs text-slate-500">{{ svc.category.name }}</td>
+              <td class="rate-cell text-right font-mono">{{ '{:,.2f}'.format(svc.price|float) }}</td>
+              <td class="w-16">
+                <input type="number" name="qty_{{ svc.id }}" min="0" max="20" value="0" class="input w-16 text-center text-sm qty-input" onchange="recalcRow(this)">
+              </td>
+              <td class="w-20">
+                <input type="number" name="discount_{{ svc.id }}" min="0" step="0.01" value="0" class="input w-20 text-center text-sm disc-input" onchange="recalcRow(this)">
+              </td>
+              <td class="tax-cell text-xs text-slate-500">{{ svc.tax_percent or 0 }}%</td>
+              <td class="line-total font-mono text-sm font-semibold text-right">0.00</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary sidebar -->
+    <div class="space-y-4">
+      <div class="card p-5 space-y-4">
+        <h2 class="text-sm font-bold text-slate-800">Invoice Summary</h2>
+        <div class="text-right space-y-1.5 text-sm">
+          <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span class="font-mono" id="subtotal">0.00</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Discount</span><span class="font-mono text-red-600" id="totalDiscount">0.00</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Tax</span><span class="font-mono" id="totalTax">0.00</span></div>
+          <hr>
+          <div class="flex justify-between text-base font-bold"><span>Grand Total</span><span class="font-mono text-brand-800" id="grandTotal">0.00</span></div>
+        </div>
+        <div>
+          <label class="label">Other Charges (₹)</label>
+          <input type="number" name="other_charges" min="0" step="0.01" value="0" class="input text-right" id="otherCharges" onchange="recalcGrand()">
+        </div>
+        <div>
+          <label class="label">Notes</label>
+          <textarea name="notes" rows="2" class="input text-xs" placeholder="Invoice note..."></textarea>
+        </div>
+      </div>
+
+      <div class="card p-5 space-y-3">
+        <h2 class="text-sm font-bold text-slate-800">Payment at Counter (Optional)</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="label">Amount (₹)</label>
+            <input type="number" name="pay_amount" min="0" step="0.01" value="0" class="input text-right">
+          </div>
+          <div>
+            <label class="label">Method</label>
+            <select name="pay_method" class="input">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" name="action" value="finalize" class="btn-primary flex-1 py-3 text-base"
+                onclick="document.getElementById('invoiceForm').submit()">Generate &amp; Finalize Invoice</button>
+      </div>
+      <button type="submit" name="action" value="draft" class="btn-secondary w-full">Save as Draft</button>
+    </div>
+  </div>
+</form>
+{% endif %}
+
+<script>
+function toggleRow(chk){
+  const tr=chk.closest('tr'), qty=tr.querySelector('.qty-input');
+  if(chk.checked){if(!qty.value||qty.value==='0')qty.value='1';}
+  else{qty.value='0';}
+  recalcRow(qty);
+}
+function recalcRow(el){
+  const tr=el.closest('tr'),
+        rate=parseFloat(tr.dataset.rate)||0,
+        tax=parseFloat(tr.dataset.tax)||0,
+        de=parseInt(tr.dataset.de)||0,
+        qty=parseInt(tr.querySelector('.qty-input').value)||0,
+        discEl=tr.querySelector('.disc-input'),
+        maxDisc=rate*qty;
+  if(de===0)discEl.value=0;
+  let disc=parseFloat(discEl.value)||0;
+  if(disc<0)disc=0;if(disc>maxDisc)disc=maxDisc;
+  const line=rate*qty-disc,
+        taxAmt=line*tax/100;
+  tr.querySelector('.line-total').textContent=(line+taxAmt).toFixed(2);
+  recalcGrand();
+}
+function recalcGrand(){
+  let sub=0,disc=0,tax=0;
+  document.querySelectorAll('#svcTable tbody tr').forEach(tr=>{
+    const qty=parseInt(tr.querySelector('.qty-input').value)||0,
+          rate=parseFloat(tr.dataset.rate)||0,
+          taxRate=parseFloat(tr.dataset.tax)||0,
+          d=parseFloat(tr.querySelector('.disc-input').value)||0;
+    sub+=rate*qty;
+    disc+=d;
+    tax+=(rate*qty-d)*taxRate/100;
+  });
+  const other=parseFloat(document.getElementById('otherCharges').value)||0;
+  document.getElementById('subtotal').textContent=sub.toFixed(2);
+  document.getElementById('totalDiscount').textContent=disc.toFixed(2);
+  document.getElementById('totalTax').textContent=tax.toFixed(2);
+  document.getElementById('grandTotal').textContent=(sub-disc+tax+other).toFixed(2);
+}
+</script>
+{% endblock %}

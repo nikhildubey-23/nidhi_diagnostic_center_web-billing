@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}New Walk-in Booking — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">New Walk-in Booking</h1>
+<p class="mt-1 text-sm text-slate-500">Register an on-site patient booking at the counter.</p>
+
+<form method="post" class="card mt-6 grid max-w-3xl gap-4 p-6 sm:grid-cols-2" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="sm:col-span-2">
+    <label class="label">Patient Name *</label>
+    {{ form.patient_name(class="input", placeholder="Full name") }}
+  </div>
+  <div>
+    <label class="label">Mobile Number *</label>
+    {{ form.mobile(class="input", inputmode="numeric") }}
+  </div>
+  <div>
+    <label class="label">Email</label>
+    {{ form.email(class="input") }}
+  </div>
+  <div>
+    <label class="label">Age</label>
+    {{ form.age(class="input", type="number", min=0, max=120) }}
+  </div>
+  <div>
+    <label class="label">Gender</label>
+    {{ form.gender(class="input") }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">Service / Test *</label>
+    {{ form.service_id(class="input") }}
+  </div>
+  <div>
+    <label class="label">Preferred Date *</label>
+    {{ form.preferred_date(class="input") }}
+  </div>
+  <div>
+    <label class="label">Preferred Time</label>
+    {{ form.preferred_time(class="input") }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">Address</label>
+    {{ form.address(class="input", rows=2) }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">Notes</label>
+    {{ form.notes(class="input", rows=3) }}
+  </div>
+  <div class="flex gap-3 sm:col-span-2">
+    <button type="submit" class="btn-primary">Create Booking</button>
+    <a href="{{ url_for('bookings.index') }}" class="btn-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

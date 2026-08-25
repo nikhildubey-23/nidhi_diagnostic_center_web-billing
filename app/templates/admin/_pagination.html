@@ -1,0 +1,15 @@
+{% if pagination.pages > 1 %}
+<div class="flex items-center justify-between border-t px-4 py-3">
+  <p class="text-xs text-slate-500">Page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} records)</p>
+  <div class="flex gap-1">
+    {% for pg in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+      {% if pg %}
+        <a href="{{ url_for(request.endpoint, page=pg, **request.args) }}"
+           class="rounded px-2.5 py-1 text-xs font-medium {{ 'bg-brand-700 text-white' if pg == pagination.page else 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100' }}">{{ pg }}</a>
+      {% else %}
+        <span class="px-1 py-1 text-xs text-slate-400">&hellip;</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

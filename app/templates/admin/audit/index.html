@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}Audit Log — {{ center_name() }}{% endblock %}
+
+{% set action_icons = {
+  'login': '&#128274;',
+  'logout': '&#128682;',
+  'booking_created': '&#128197;',
+  'booking_cancelled': '&#10060;',
+  'booking_status_changed': '&#128260;',
+  'booking_rescheduled': '&#128197;',
+  'patient_created': '&#128100;',
+  'patient_updated': '&#128100;',
+  'invoice_created': '&#128196;',
+  'invoice_finalized': '&#128196;',
+  'invoice_cancelled': '&#10060;',
+  'payment_recorded': '&#128176;',
+  'payment_refunded': '&#128176;',
+  'report_uploaded': '&#128206;',
+  'report_downloaded': '&#128206;',
+  'report_completed': '&#9989;',
+  'invoice_pdf_downloaded': '&#128196;',
+  'booking_patient_linked': '&#128279;',
+  'user_created': '&#128101;',
+  'user_updated': '&#128101;',
+  'setting_changed': '&#9881;',
+  'website_content_updated': '&#128196;',
+} %}
+
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Audit Log</h1>
+<p class="mt-1 text-sm text-slate-500">Immutable record of all staff actions.</p>
+
+<form method="get" class="card mt-4 flex flex-wrap gap-2 p-4">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search entity / user..." class="input min-w-48 flex-1">
+  <select name="action" class="input w-56">
+    <option value="">All Actions</option>
+    {% for a in actions %}<option value="{{ a }}" {% if action == a %}selected{% endif %}>{{ a }}</option>{% endfor %}
+  </select>
+  <button class="btn-primary px-4">Filter</button>
+</form>
+
+<div class="card mt-4 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead>
+      <tbody>
+        {% for a in pagination.items %}
+        <tr>
+          <td class="whitespace-nowrap text-xs">{{ fmt_datetime(a.created_at) }}</td>
+          <td>{{ a.user.full_name if a.user else 'System' }}</td>
+          <td><span class="badge bg-slate-100 text-slate-600">{{ action_icons.get(a.action, '&#128196;') | safe }} {{ a.action }}</span></td>
+          <td class="text-sm">{{ a.entity_type }}{% if a.entity_id %} #{{ a.entity_id }}{% endif %}</td>
+          <td class="max-w-md"><code class="block truncate rounded bg-slate-50 px-2 py-1 text-[11px] text-slate-500" title="{{ a.details }}">{{ a.details or '—' }}</code></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-400">No audit entries found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "admin/_pagination.html" %}
+</div>
+{% endblock %}

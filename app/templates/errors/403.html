@@ -1,0 +1,12 @@
+{# Minimal error page #}
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ center_name() }}{% endblock %}
+{% block body %}
+<div class="flex min-h-screen items-center justify-center px-4">
+  <div class="text-center">
+    <p class="text-6xl font-extrabold text-brand-700">{{ code }}</p>
+    <h1 class="mt-2 text-2xl font-bold text-slate-900">{{ message }}</h1>
+    <a href="{{ url_for('website.home') }}" class="btn-primary mt-6">Go to Homepage</a>
+  </div>
+</div>
+{% endblock %}

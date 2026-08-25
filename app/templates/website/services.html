@@ -1,0 +1,40 @@
+{% extends "website/base.html" %}
+{% block title %}Services — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="bg-white">
+  <div class="mx-auto max-w-6xl px-4 py-14">
+    <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">Our Services</p>
+    <h1 class="mt-1 text-3xl font-extrabold text-slate-900 sm:text-4xl">Diagnostic Services in Bilaspur</h1>
+    <p class="mt-4 max-w-2xl text-slate-600">Browse tests by category. Click any category for preparation instructions and details.</p>
+  </div>
+</section>
+<section class="mx-auto max-w-6xl space-y-12 px-4 pb-16 pt-4">
+  {% for cat in categories %}
+  <div id="{{ cat.slug }}">
+    <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
+      <h2 class="flex items-center gap-2 text-xl font-bold text-slate-900">
+        <span>{{ cat.icon or '&#9877;' }}</span> {{ cat.name }}
+      </h2>
+      <a href="{{ url_for('website.category', slug=cat.slug) }}" class="text-sm font-semibold text-brand-700 hover:underline">Category details &rarr;</a>
+    </div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for svc in cat.services.filter_by(is_active=True) %}
+      <div class="card flex h-full flex-col p-5">
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="font-semibold text-slate-900">{{ svc.name }}</h3>
+          {% if show_prices and svc.show_price_public %}
+          <span class="badge bg-emerald-50 text-emerald-700">&#8377;{{ '{:,.0f}'.format(svc.price) }}</span>
+          {% endif %}
+        </div>
+        <p class="mt-2 line-clamp-2 text-sm text-slate-500">{{ svc.description }}</p>
+        <div class="mt-auto flex items-center justify-between pt-4">
+          <span class="text-xs text-slate-400">&#9202; {{ svc.duration_minutes or 30 }} min</span>
+          <a href="{{ url_for('website.book', service=svc.id) }}" class="text-sm font-semibold text-brand-700 hover:underline">Book &rarr;</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

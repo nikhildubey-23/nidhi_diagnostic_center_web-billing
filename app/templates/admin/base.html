@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="flex h-screen bg-slate-100" x-data="{sidebar: true}">
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-slate-200 bg-brand-950 text-slate-200 transition-transform duration-300 ease-in-out lg:translate-x-0"
+         :class="sidebar ? 'translate-x-0' : '-translate-x-full'">
+    <!-- Logo -->
+    <div class="flex h-14 items-center gap-2 border-b border-white/10 px-4">
+      <span class="flex h-8 w-8 items-center justify-center rounded bg-brand-700 text-xs font-bold text-white">ND</span>
+      <span class="truncate text-sm font-bold text-white">{{ center_name() }}</span>
+    </div>
+
+    <nav class="flex-1 space-y-0.5 overflow-y-auto p-3 text-sm">
+      {% macro nav_item(href, label, icon, perm='dashboard.view') -%}
+        {% if current_user.has_permission(perm) %}
+        <a href="{{ href }}" class="flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition
+          {% if request.path.rstrip('/') == href.rstrip('/') %}bg-brand-700 text-white{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">
+          <span class="text-base">{{ icon | safe }}</span>{{ label }}
+        </a>
+        {% endif %}
+      {%- endmacro %}
+
+      <p class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Main</p>
+      {{ nav_item(url_for('admin_dash.dashboard'), 'Dashboard', '&#128200;') }}
+      {{ nav_item(url_for('billing.counter'), 'Billing Counter', '&#128179;', 'billing.manage') }}
+      {{ nav_item(url_for('bookings.create'), 'New Booking (Walk-in)', '&#128197;', 'bookings.manage') }}
+
+      <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Management</p>
+      {{ nav_item(url_for('bookings.index'), 'Bookings', '&#128203;', 'bookings.manage') }}
+      {{ nav_item(url_for('patients.index'), 'Patients', '&#128100;', 'patients.manage') }}
+      {{ nav_item(url_for('services.index'), 'Services', '&#128295;', 'services.manage') }}
+
+      <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Finance</p>
+      {{ nav_item(url_for('invoices.index'), 'Invoices', '&#128196;', 'billing.manage') }}
+      {{ nav_item(url_for('payments.index'), 'Payments', '&#128176;', 'payments.manage') }}
+      {{ nav_item(url_for('finreports.index'), 'Financial Reports', '&#128202;', 'finreports.view') }}
+      {{ nav_item(url_for('finreports.daily_collection'), 'Daily Collection', '&#128197;', 'finreports.view') }}
+
+      <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Reports</p>
+      {{ nav_item(url_for('reports.index'), 'Diagnostic Reports', '&#128196;', 'reports.manage') }}
+
+      <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Admin</p>
+      {{ nav_item(url_for('users.index'), 'Staff Users', '&#128101;', 'users.manage') }}
+      {{ nav_item(url_for('settings.index'), 'Settings', '&#9881;', 'settings.manage') }}
+      {{ nav_item(url_for('audit.index'), 'Audit Log', '&#128220;', 'audit.view') }}
+
+      <hr class="my-4 border-white/10">
+      <a href="{{ url_for('website.home') }}" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white" target="_blank">
+        &#127760; View Website
+      </a>
+    </nav>
+
+    <div class="border-t border-white/10 px-4 py-3">
+      <div class="text-xs text-slate-400 truncate">{{ current_user.full_name }}</div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-500">{{ current_user.role.label if current_user.role else current_user.role_name }}</div>
+      <a href="{{ url_for('auth.logout') }}" class="mt-2 flex items-center gap-1.5 text-xs text-slate-400 hover:text-white">
+        &#10140; Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Backdrop overlay for mobile sidebar -->
+  <div x-show="sidebar" x-cloak
+       @click="sidebar = false"
+       class="fixed inset-0 z-20 bg-black/50 lg:hidden"
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0">
+  </div>
+
+  <!-- Main content -->
+  <div class="flex flex-1 flex-col pl-0 lg:pl-64">
+    <!-- Top bar -->
+    <header class="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm">
+      <button class="rounded p-1 hover:bg-slate-100 lg:hidden" @click="sidebar = !sidebar" aria-label="Toggle sidebar">
+        <svg class="h-6 w-6 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+      </button>
+
+      <!-- Global search -->
+      <div class="relative ml-4 hidden max-w-md flex-1 sm:block" x-data="globalSearch()">
+        <input type="text" x-model="q" @input.debounce.350ms="doSearch()"
+               placeholder="Search patients, invoices, bookings..." class="input w-full bg-slate-50 pl-9" />
+        <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        <div x-show="results.length" x-cloak class="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+          <template x-for="r in results">
+            <a :href="r.url" class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-slate-50">
+              <span class="w-16 shrink-0 text-[10px] font-bold uppercase" :class="r.type==='patient'?'text-brand-600':r.type==='invoice'?'text-emerald-600':'text-amber-600'" x-text="r.type"></span>
+              <span x-text="r.label" class="flex-1 truncate"></span>
+            </a>
+          </template>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 text-sm">
+        <span class="hidden text-slate-500 md:inline">{{ current_user.full_name }}</span>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="text-xs text-slate-400 hover:text-red-600">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="mb-4 rounded-lg border px-4 py-2.5 text-sm
+            {% if category == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+            {% elif category == 'danger' %}border-red-200 bg-red-50 text-red-800
+            {% elif category == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+            {% else %}border-brand-200 bg-brand-50 text-brand-800{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

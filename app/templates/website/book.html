@@ -1,0 +1,92 @@
+{% extends "website/base.html" %}
+{% block title %}Book Your Test — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 py-12">
+  <h1 class="text-3xl font-extrabold text-slate-900">Book an Appointment</h1>
+  <p class="mt-2 text-slate-500">Fill in the details below. You'll receive a booking reference number — our staff will call to confirm your slot.</p>
+
+  <form method="post" enctype="multipart/form-data" class="card mt-8 space-y-5 p-6 sm:p-8" novalidate>
+    {{ form.hidden_tag() }}
+
+    {% macro field_error(field) %}
+      {% if field.errors %}<p class="mt-1 text-xs text-red-600">{{ field.errors[0] }}</p>{% endif %}
+    {% endmacro %}
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <label class="label" for="patient_name">{{ form.patient_name.label.text }} *</label>
+        {{ form.patient_name(class="input", placeholder="Full name") }}
+        {{ field_error(form.patient_name) }}
+      </div>
+      <div>
+        <label class="label" for="mobile">Mobile Number *</label>
+        {{ form.mobile(class="input", inputmode="numeric", placeholder="10-digit mobile") }}
+        {{ field_error(form.mobile) }}
+      </div>
+      <div>
+        <label class="label" for="email">Email (optional)</label>
+        {{ form.email(class="input", placeholder="you@example.com") }}
+        {{ field_error(form.email) }}
+      </div>
+      <div>
+        <label class="label" for="age">Age</label>
+        {{ form.age(class="input", type="number", min=0, max=120) }}
+        {{ field_error(form.age) }}
+      </div>
+      <div>
+        <label class="label" for="gender">Gender *</label>
+        {{ form.gender(class="input") }}
+        {{ field_error(form.gender) }}
+      </div>
+      <div class="sm:col-span-2">
+        <label class="label" for="service_id">Service / Test *</label>
+        {{ form.service_id(class="input") }}
+        {{ field_error(form.service_id) }}
+        {% if services %}
+        <details class="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-800">
+          <summary class="cursor-pointer font-semibold">Preparation instructions</summary>
+          <ul class="mt-2 space-y-1.5">
+            {% for s in services if s.preparation_instructions %}
+            <li><strong>{{ s.name }}:</strong> {{ s.preparation_instructions }}</li>
+            {% endfor %}
+          </ul>
+        </details>
+        {% endif %}
+      </div>
+      <div>
+        <label class="label" for="preferred_date">Preferred Date *</label>
+        {{ form.preferred_date(class="input", min=today.isoformat()) }}
+        {{ field_error(form.preferred_date) }}
+      </div>
+      <div>
+        <label class="label" for="preferred_time">Preferred Time</label>
+        {{ form.preferred_time(class="input") }}
+        {{ field_error(form.preferred_time) }}
+      </div>
+      <div class="sm:col-span-2">
+        <label class="label" for="technician_preference">Doctor / Technician Preference (optional)</label>
+        {{ form.technician_preference(class="input") }}
+      </div>
+      <div class="sm:col-span-2">
+        <label class="label" for="address">Address (optional)</label>
+        {{ form.address(class="input", rows=2) }}
+      </div>
+      <div class="sm:col-span-2">
+        <label class="label" for="notes">Notes (optional)</label>
+        {{ form.notes(class="input", rows=3, placeholder="Symptoms, referring doctor, special requests...") }}
+      </div>
+      <div class="sm:col-span-2">
+        <label class="label" for="prescription">Upload Prescription / Referral (PDF/JPG/PNG, max 5 MB)</label>
+        {{ form.prescription(class="mt-1 block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100") }}
+        {{ field_error(form.prescription) }}
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary w-full py-3 text-base">Submit Booking Request</button>
+    <p class="text-center text-xs text-slate-400">
+      By submitting you agree to be contacted about this appointment.
+      Status remains <strong>Pending</strong> until confirmed by our staff.
+    </p>
+  </form>
+</section>
+{% endblock %}

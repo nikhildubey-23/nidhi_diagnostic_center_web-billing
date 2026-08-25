@@ -1,0 +1,16 @@
+2026-08-23 14:22:15,431 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:02:59,849 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:03:58,238 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:04:37,420 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:09:58,307 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:15:48,572 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:17:53,498 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:19:23,559 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:40:10,065 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:42:00,772 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:56:18,763 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-23 15:58:23,459 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-24 14:40:48,994 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-24 15:16:57,288 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-24 15:36:10,341 WARNING app.auth.routes :: Failed login attempt username=testadmin ip=127.0.0.1
+2026-08-24 15:36:11,638 WARNING app :: SMTP credentials not configured

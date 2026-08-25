@@ -1,0 +1,62 @@
+{% extends "website/base.html" %}
+{% block title %}{{ category.name }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="bg-white">
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <nav class="text-xs text-slate-400"><a href="{{ url_for('website.home') }}" class="hover:text-brand-600">Home</a> / <a href="{{ url_for('website.services') }}" class="hover:text-brand-600">Services</a> / {{ category.name }}</nav>
+    <h1 class="mt-2 flex items-center gap-3 text-3xl font-extrabold text-slate-900">
+      <span>{{ category.icon or '&#9877;' }}</span>{{ category.name }}
+    </h1>
+    {% if category.description %}<p class="mt-3 max-w-3xl text-slate-600">{{ category.description }}</p>{% endif %}
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-8 grid gap-8 lg:grid-cols-3">
+  <div class="space-y-4 lg:col-span-2">
+    {% for svc in category.services.filter_by(is_active=True) %}
+    <article class="card p-6" id="svc-{{ svc.id }}">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">{{ svc.name }}</h2>
+          <p class="mt-0.5 text-xs uppercase tracking-wide text-slate-400">Code: {{ svc.code }} &middot; &#9202; {{ svc.duration_minutes or 30 }} min</p>
+        </div>
+        {% if show_prices and svc.show_price_public %}
+          <span class="rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-700">&#8377;{{ '{:,.0f}'.format(svc.price) }}</span>
+        {% endif %}
+      </div>
+      <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ svc.description }}</p>
+      {% if svc.preparation_instructions %}
+      <div class="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+        <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Preparation</p>
+        <p class="mt-1 text-sm text-amber-800">{{ svc.preparation_instructions }}</p>
+      </div>
+      {% endif %}
+      <a href="{{ url_for('website.book', service=svc.id) }}" class="btn-primary mt-4">Book {{ svc.name }}</a>
+    </article>
+    {% endfor %}
+  </div>
+
+  <aside class="space-y-4">
+    <div class="card p-5">
+      <h3 class="font-bold text-slate-900">Book this test</h3>
+      <p class="mt-1 text-sm text-slate-500">Pick a convenient date and time — we'll confirm by phone.</p>
+      <a href="{{ url_for('website.book', service=category.services.filter_by(is_active=True).first().id if category.services.filter_by(is_active=True).first() else None) }}"
+         class="btn-primary mt-3 w-full">Book Your Test</a>
+    </div>
+    {% if others %}
+    <div class="card p-5">
+      <h3 class="font-bold text-slate-900">Related Categories</h3>
+      <ul class="mt-3 space-y-2 text-sm">
+        {% for c in others %}
+        <li><a class="text-brand-700 hover:underline" href="{{ url_for('website.category', slug=c.slug) }}">{{ c.icon or '' }} {{ c.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <div class="card p-5 text-sm text-slate-600">
+      <h3 class="font-bold text-slate-900">Need help?</h3>
+      <p class="mt-2">Call us at <strong>{{ get_setting('phone') }}</strong><br>{{ get_setting('opening_hours_weekday') }}</p>
+    </div>
+  </aside>
+</section>
+{% endblock %}

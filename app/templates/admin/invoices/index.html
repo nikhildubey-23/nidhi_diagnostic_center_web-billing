@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% block title %}Invoices — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Invoices</h1>
+
+<form method="get" class="card mt-4 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
+  <input type="text" name="q" value="{{ filters.q }}" placeholder="Invoice # / patient name / mobile" class="input lg:col-span-2">
+  <select name="status" class="input">
+    <option value="">All Statuses</option>
+    {% for v, l in statuses %}<option value="{{ v }}" {% if filters.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+  </select>
+  <div class="flex gap-2 lg:col-span-2">
+    <input type="date" name="from" value="{{ filters.from }}" class="input flex-1" title="From">
+    <span class="self-center text-slate-400">to</span>
+    <input type="date" name="to" value="{{ filters.to }}" class="input flex-1" title="To">
+    <button class="btn-primary px-3">Filter</button>
+  </div>
+</form>
+
+<div class="card mt-4 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Invoice #</th><th>Patient</th><th>Date</th><th>Total (₹)</th><th>Paid (₹)</th><th>Balance (₹)</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for i in pagination.items %}
+        <tr onclick="window.location='{{ url_for('invoices.view', invoice_id=i.id) }}'" class="cursor-pointer hover:bg-slate-50">
+          <td class="font-mono text-xs">{{ i.invoice_code }}</td>
+          <td>{{ i.patient.full_name if i.patient else '—' }}<span class="block text-xs text-slate-400">{{ i.patient.mobile if i.patient }}</span></td>
+          <td>{{ fmt_date(i.created_at) }}</td>
+          <td>{{ inr(i.grand_total) }}</td>
+          <td class="text-emerald-700">{{ inr(i.amount_paid) }}</td>
+          <td class="{% if i.balance_amount|float > 0 %}font-semibold text-red-600{% else %}text-slate-400{% endif %}">{{ inr(i.balance_due) if i.balance_amount|float > 0 else '0.00' }}</td>
+          <td>
+            {% set cls = {'draft':'bg-slate-100 text-slate-600','finalized':'bg-blue-50 text-blue-700','partially_paid':'bg-amber-50 text-amber-700','paid':'bg-emerald-50 text-emerald-700','cancelled':'bg-red-50 text-red-700'} %}
+            <span class="badge {{ cls.get(i.status,'bg-slate-100') }}">{{ i.status_label }}</span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-400">No invoices found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "admin/_pagination.html" %}
+</div>
+{% endblock %}

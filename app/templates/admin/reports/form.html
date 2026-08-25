@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Upload Report — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Upload Diagnostic Report</h1>
+
+<form method="post" enctype="multipart/form-data" class="card mt-6 grid max-w-2xl gap-4 p-6 sm:grid-cols-2" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="sm:col-span-2">
+    <label class="label">Report Title *</label>
+    {{ form.title(class="input", placeholder="e.g. USG Whole Abdomen Report") }}
+  </div>
+  <div>
+    <label class="label">Patient *</label>
+    {{ form.patient_id(class="input") }}
+  </div>
+  <div>
+    <label class="label">Test / Service</label>
+    {{ form.service_id(class="input") }}
+  </div>
+  <div>
+    <label class="label">Related Booking</label>
+    {{ form.booking_id(class="input") }}
+  </div>
+  <div>
+    <label class="label">Reporting Doctor</label>
+    {{ form.doctor_name(class="input") }}
+  </div>
+  <div>
+    <label class="label">Report Date *</label>
+    {{ form.report_date(class="input") }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">Notes</label>
+    {{ form.notes(class="input", rows=3) }}
+  </div>
+  <div class="sm:col-span-2">
+    <label class="label">Report File * (PDF/JPG/PNG, max 10 MB)</label>
+    {{ form.file(class="mt-1 block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100", accept=".pdf,.jpg,.jpeg,.png") }}
+  </div>
+  <div class="flex gap-3 sm:col-span-2">
+    <button type="submit" class="btn-primary">Upload Report</button>
+    <a href="{{ url_for('reports.index') }}" class="btn-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

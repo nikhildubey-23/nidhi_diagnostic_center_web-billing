@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block title %}Financial Reports — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Financial Reports</h1>
+
+<!-- Period selector -->
+<form method="get" class="card mt-4 flex flex-wrap items-end gap-3 p-4">
+  <div>
+    <label class="label">Preset</label>
+    <select name="preset" id="presetSel" class="input w-36" onchange="document.getElementById('customDates').style.display=this.value==='custom'?'flex':'none'">
+      {% for p in presets %}<option value="{{ p }}" {% if (request.args.get('preset') or 'today') == p %}selected{% endif %}>{{ p|capitalize }}</option>{% endfor %}
+    </select>
+  </div>
+  <div id="customDates" class="flex gap-2 items-end" style="display: {{ 'flex' if request.args.get('preset') == 'custom' else 'none' }}">
+    <div><label class="label">From</label><input type="date" name="from" value="{{ start.isoformat() if request.args.get('preset')=='custom' else '' }}" class="input"></div>
+    <div><label class="label">To</label><input type="date" name="to" value="{{ end.isoformat() if request.args.get('preset')=='custom' else '' }}" class="input"></div>
+  </div>
+  <button class="btn-primary px-4">Apply</button>
+</form>
+
+<p class="mt-4 text-sm text-slate-500">
+  Showing <strong>{{ fmt_date(start) }}</strong> &mdash; <strong>{{ fmt_date(end) }}</strong>
+</p>
+
+<!-- Totals cards -->
+<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+  <div class="card p-5"><p class="text-[11px] font-bold uppercase text-slate-500">Invoices</p><p class="text-xl font-extrabold">{{ totals.count }}</p></div>
+  <div class="card p-5"><p class="text-[11px] font-bold uppercase text-slate-500">Sales (Subtotal)</p><p class="text-xl font-extrabold text-brand-800">{{ inr(totals.sales) }}</p></div>
+  <div class="card p-5"><p class="text-[11px] font-bold uppercase text-slate-500">Discounts Given</p><p class="text-xl font-extrabold text-red-600">{{ inr(totals.discounts) }}</p></div>
+  <div class="card p-5"><p class="text-[11px] font-bold uppercase text-slate-500">Collected</p><p class="text-xl font-extrabold text-emerald-700">{{ inr(totals.paid) }}</p></div>
+  <div class="card p-5"><p class="text-[11px] font-bold uppercase text-slate-500">Outstanding</p><p class="text-xl font-extrabold text-amber-600">{{ inr(totals.outstanding) }}</p></div>
+</div>
+
+<!-- Exports -->
+<div class="mt-4 flex flex-wrap gap-2">
+  <a href="{{ url_for('finreports.export', preset=request.args.get('preset','today'), from=request.args.get('from'), to=request.args.get('to'), format='csv') }}" class="btn-secondary text-sm">&#11015; CSV / Excel</a>
+  <a href="{{ url_for('finreports.export', preset=request.args.get('preset','today'), from=request.args.get('from'), to=request.args.get('to'), format='pdf') }}" class="btn-secondary text-sm">&#128196; PDF Summary</a>
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <!-- Category breakdown -->
+  <div class="card overflow-hidden">
+    <div class="border-b bg-slate-50 px-5 py-2.5"><h2 class="text-sm font-bold text-slate-800">Category-wise Sales</h2></div>
+    <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Category</th><th>Items Sold</th><th>Sales (₹)</th></tr></thead>
+      <tbody>
+        {% for row in category_breakdown %}
+        <tr><td>{{ row.name }}</td><td>{{ row.items }}</td><td class="font-mono">{{ inr(row.sales) }}</td></tr>
+        {% else %}<tr><td colspan="3" class="px-4 py-6 text-center text-sm text-slate-400">No sales in this period.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Payment method breakdown -->
+  <div class="card overflow-hidden">
+    <div class="border-b bg-slate-50 px-5 py-2.5"><h2 class="text-sm font-bold text-slate-800">Payment Methods</h2></div>
+    <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Method</th><th>Transactions</th><th>Amount (₹)</th></tr></thead>
+      <tbody>
+        {% for row in method_breakdown %}
+        <tr><td>{{ row.method }}</td><td>{{ row.count }}</td><td class="font-mono">{{ inr(row.amount) }}</td></tr>
+        {% else %}<tr><td colspan="3" class="px-4 py-6 text-center text-sm text-slate-400">No payments in this period.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

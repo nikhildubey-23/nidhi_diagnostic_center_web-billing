@@ -1,0 +1,36 @@
+{% extends "website/base.html" %}
+{% block content %}
+<section class="mx-auto max-w-2xl px-4 py-16 text-center">
+  <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+    <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+  </span>
+  <h1 class="mt-5 text-3xl font-extrabold text-slate-900">Booking Request Received!</h1>
+  <p class="mt-2 text-slate-500">Your appointment request has been registered and is <strong>pending confirmation</strong>. Our staff will call you shortly to confirm the slot.</p>
+
+  <div class="card mt-8 p-6 text-left">
+    <div class="rounded-lg bg-brand-50 border border-brand-100 px-4 py-3 text-center">
+      <p class="text-xs uppercase tracking-wide text-brand-700 font-bold">Your Booking Reference</p>
+      <p class="mt-1 text-2xl font-extrabold tracking-wider text-brand-900">{{ booking.booking_code }}</p>
+    </div>
+    <dl class="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+      <div><dt class="font-semibold text-slate-500">Name</dt><dd>{{ booking.patient_name }}</dd></div>
+      <div><dt class="font-semibold text-slate-500">Mobile</dt><dd>{{ booking.mobile }}</dd></div>
+      <div><dt class="font-semibold text-slate-500">Service</dt><dd>{{ booking.service.name }}</dd></div>
+      <div><dt class="font-semibold text-slate-500">Status</dt><dd><span class="badge bg-amber-50 text-amber-700">Pending Confirmation</span></dd></div>
+      <div><dt class="font-semibold text-slate-500">Preferred Date</dt><dd>{{ fmt_date(booking.preferred_date) }}</dd></div>
+      <div><dt class="font-semibold text-slate-500">Preferred Time</dt><dd>{% if booking.preferred_time %}{{ booking.preferred_time.strftime('%I:%M %p') }}{% else %}Any / First available{% endif %}</dd></div>
+    </dl>
+    {% if booking.service.preparation_instructions %}
+    <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <strong>Preparation:</strong> {{ booking.service.preparation_instructions }}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="mt-8 flex flex-wrap justify-center gap-3">
+    <a href="{{ url_for('website.book_status', code=booking.booking_code) }}" class="btn-secondary">Check Status Later</a>
+    <a href="{{ url_for('website.home') }}" class="btn-primary">Back to Home</a>
+  </div>
+  <p class="mt-6 text-xs text-slate-400">Please save this reference number. Questions? Call {{ get_setting('phone') }}.</p>
+</section>
+{% endblock %}

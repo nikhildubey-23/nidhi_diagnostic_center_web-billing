@@ -1,0 +1,51 @@
+{% extends "website/base.html" %}
+{% block title %}Contact Us — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-12">
+  <h1 class="text-3xl font-extrabold text-slate-900">Contact Us</h1>
+  <p class="mt-2 text-slate-500">We're happy to help with bookings, reports and general enquiries.</p>
+
+  <div class="mt-8 grid gap-8 lg:grid-cols-5">
+    <!-- Info + form -->
+    <div class="space-y-6 lg:col-span-2">
+      <div class="card p-6 space-y-4 text-sm">
+        <p class="flex items-start gap-3"><span class="text-brand-700">&#128205;</span><span><strong>Address</strong><br>{{ get_setting('address_line1') }}, {{ get_setting('address_line2') }}</span></p>
+        <p class="flex items-start gap-3"><span class="text-brand-700">&#9742;</span><span><strong>Phone</strong><br>{{ get_setting('phone') }}{% if get_setting('phone_secondary') %}, {{ get_setting('phone_secondary') }}{% endif %}</span></p>
+        <p class="flex items-start gap-3"><span class="text-brand-700">&#128172;</span><span><strong>WhatsApp</strong><br>{{ get_setting('whatsapp') }}</span></p>
+        <p class="flex items-start gap-3"><span class="text-brand-700">&#9993;</span><span><strong>Email</strong><br>{{ get_setting('email') }}</span></p>
+        <p class="flex items-start gap-3"><span class="text-brand-700">&#9200;</span><span><strong>Hours</strong><br>{{ get_setting('opening_hours_weekday') }}<br>{{ get_setting('opening_hours_sunday') }}</span></p>
+        <a href="{{ get_setting('map_link_url') }}" target="_blank" rel="noopener" class="btn-secondary w-full">Open in Google Maps</a>
+      </div>
+
+      <form id="contact-form" method="post" action="{{ url_for('website.contact_submit') }}" class="card space-y-4 p-6" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h2 class="font-bold text-slate-900">Send us a message</h2>
+        <div>
+          <label class="label" for="c_name">Your Name *</label>
+          <input id="c_name" name="name" required maxlength="120" class="input">
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="c_phone">Phone *</label>
+            <input id="c_phone" name="phone" required class="input" inputmode="tel">
+          </div>
+          <div>
+            <label class="label" for="c_email">Email</label>
+            <input id="c_email" name="email" type="email" class="input">
+          </div>
+        </div>
+        <div>
+          <label class="label" for="c_msg">Message *</label>
+          <textarea id="c_msg" name="message" required rows="4" class="input"></textarea>
+        </div>
+        <button type="submit" class="btn-primary w-full">Send Message</button>
+      </form>
+    </div>
+
+    <!-- Map -->
+    <div class="lg:col-span-3 overflow-hidden rounded-xl border border-slate-200">
+      <iframe title="Location map" src="{{ get_setting('map_embed_url') }}" class="aspect-video w-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

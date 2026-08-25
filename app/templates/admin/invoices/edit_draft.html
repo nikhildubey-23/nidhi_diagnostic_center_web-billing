@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}Edit Draft {{ invoice.invoice_code }} — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Edit Draft: {{ invoice.invoice_code }}</h1>
+<p class="mt-1 text-sm text-slate-500">Patient: <strong>{{ invoice.patient.full_name }}</strong> ({{ invoice.patient.patient_code }})</p>
+
+<form method="post" class="mt-6" id="draftForm">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 card overflow-hidden">
+      <div class="border-b bg-slate-50 px-5 py-3"><h2 class="text-sm font-bold text-slate-800">Services</h2></div>
+      <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead><tr><th class="w-8"></th><th>Service</th><th>Rate</th><th>Qty</th><th>Discount</th><th>Line Total</th></tr></thead>
+        <tbody>
+          {% set current_qty = {} %}
+          {% for item in invoice.items %}{% if current_qty.update({item.service_id: item.qty}) %}{% endif %}{% endfor %}
+          {% set current_disc = {} %}
+          {% for item in invoice.items %}{% if current_disc.update({item.service_id: item.discount_amount}) %}{% endif %}{% endfor %}
+          {% for svc in services %}
+          <tr data-rate="{{ svc.price }}" data-tax="{{ svc.tax_percent or 0 }}">
+            <td class="text-center">
+              <input type="hidden" name="add_{{ svc.id }}" value="">
+              <input type="checkbox" name="add_{{ svc.id }}" value="1"
+                     class="h-4 w-4 rounded border-slate-300 text-brand-600"
+                     {% if svc.id in current_qty %}checked{% endif %}
+                     onchange="toggleRow(this)">
+            </td>
+            <td class="font-medium">{{ svc.name }} <span class="text-[10px] text-slate-400">{{ svc.code }}</span></td>
+            <td class="font-mono">{{ '{:,.2f}'.format(svc.price|float) }}</td>
+            <td><input type="number" name="qty_{{ svc.id }}" min="0" max="20" value="{{ current_qty.get(svc.id, 0) }}" class="input w-16 text-center text-sm qty-input" onchange="recalcGrand()"></td>
+            <td><input type="number" name="discount_{{ svc.id }}" min="0" step="0.01" value="{{ current_disc.get(svc.id, 0) }}" class="input w-20 text-center text-sm disc-input" onchange="recalcGrand()"></td>
+            <td class="line-total font-mono text-sm">—</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="card p-5 space-y-3">
+        <h2 class="text-sm font-bold text-slate-800">Other Charges &amp; Notes</h2>
+        <div><label class="label">Other Charges (\u20b9)</label>
+          <input type="number" name="other_charges" min="0" step="0.01" value="{{ '{:.2f}'.format(invoice.other_charges|float) }}" class="input text-right"></div>
+        <div><label class="label">Notes</label>
+          <textarea name="notes" rows="3" class="input text-sm">{{ invoice.notes or '' }}</textarea></div>
+      </div>
+      <button type="submit" class="btn-primary w-full">Save Draft</button>
+      <a href="{{ url_for('invoices.view', invoice_id=invoice.id) }}" class="btn-secondary w-full text-center">Back to Invoice</a>
+    </div>
+  </div>
+</form>
+
+<script>
+function toggleRow(chk){
+  const tr = chk.closest('tr'), qty = tr.querySelector('.qty-input');
+  if (chk.checked && (!qty.value || qty.value === '0')) qty.value = '1';
+  recalcGrand();
+}
+function recalcGrand(){}
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "website/base.html" %}
+{% block title %}About Us — {{ center_name() }}{% endblock %}
+{% block content %}
+<section class="bg-white">
+  <div class="mx-auto max-w-6xl px-4 py-14">
+    <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">About Us</p>
+    {% set intro = content.get('about_intro') %}
+    <h1 class="mt-1 text-3xl font-extrabold text-slate-900 sm:text-4xl">{{ intro.title if intro else 'About ' ~ center_name() }}</h1>
+    <p class="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">{{ intro.body if intro else '' }}</p>
+  </div>
+</section>
+
+<section class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-2">
+  <div class="card overflow-hidden p-7">
+    {% set mission = content.get('about_mission') %}
+    <h2 class="text-xl font-bold text-brand-900">&#127919; {{ mission.title if mission else 'Our Mission' }}</h2>
+    <p class="mt-3 leading-relaxed text-slate-600">{{ mission.body if mission else '' }}</p>
+  </div>
+  <div class="card overflow-hidden p-7">
+    <h2 class="text-xl font-bold text-brand-900">&#128300; Technology &amp; Equipment</h2>
+    <ul class="mt-3 space-y-2 text-sm text-slate-600">
+      <li>&bull; Colour Doppler ultrasound systems with convex, linear &amp; endocavity probes</li>
+      <li>&bull; High-frequency digital radiography (DR) X-Ray system</li>
+      <li>&bull; Multi-slice CT scanner for head, chest and body imaging</li>
+      <li>&bull; Fully autoanalyser pathology lab with barcoded sample tracking</li>
+      <li>&bull; PACS-based digital reporting and archiving</li>
+    </ul>
+  </div>
+</section>
+
+<section class="bg-white py-14">
+  <div class="mx-auto max-w-6xl px-4">
+    <h2 class="text-center text-2xl font-bold text-slate-900">Our Team</h2>
+    <div class="mt-8 grid gap-6 sm:grid-cols-3">
+      <div class="card p-6 text-center">
+        <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-2xl">&#128104;&#8205;&#9877;</span>
+        <h3 class="mt-3 font-bold text-slate-900">Consultant Radiologists</h3>
+        <p class="mt-1 text-sm text-slate-500">Experienced MD radiologists for ultrasound and CT reporting.</p>
+      </div>
+      <div class="card p-6 text-center">
+        <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl">&#129514;</span>
+        <h3 class="mt-3 font-bold text-slate-900">Lab Technicians</h3>
+        <p class="mt-1 text-sm text-slate-500">Certified technicians following strict quality-control protocols.</p>
+      </div>
+      <div class="card p-6 text-center">
+        <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-2xl">&#129491;</span>
+        <h3 class="mt-3 font-bold text-slate-900">Caring Support Staff</h3>
+        <p class="mt-1 text-sm text-slate-500">Trained front-desk team to guide you through every step.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-4xl px-4 py-14 text-center">
+  <h2 class="text-2xl font-bold text-slate-900">Quality &amp; Patient Care</h2>
+  <p class="mt-3 leading-relaxed text-slate-600">
+    Every report at {{ center_name() }} is verified through a two-step check before delivery.
+    We maintain daily calibration logs, participate in external quality assurance for lab
+    parameters, and follow strict infection-control practices. Your comfort, privacy and
+    time matter to us — that is why most reports are delivered the same day.
+  </p>
+  <a href="{{ url_for('website.book') }}" class="btn-primary mt-6">Book Your Test Today</a>
+</section>
+{% endblock %}

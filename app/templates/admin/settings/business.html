@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block title %}Business Settings — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Settings</h1>
+<p class="mt-1 text-sm text-slate-500">Business info, invoice settings and website content.</p>
+
+<form method="post" action="{{ url_for('settings.save') }}" class="mt-6 grid gap-6 lg:grid-cols-2">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card p-6 space-y-4">
+    <h2 class="text-sm font-bold text-slate-800">Centre Information</h2>
+    {% for key, label in business_keys %}
+    <div>
+      <label class="label">{{ label }}</label>
+      <input type="text" name="{{ key }}" value="{{ data.get(key, '') }}" class="input">
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="space-y-6">
+    <div class="card p-6 space-y-4">
+      <h2 class="text-sm font-bold text-slate-800">Website Content &amp; Hours</h2>
+      {% for key, label in content_keys %}
+      <div>
+        <label class="label">{{ label }}</label>
+        {% if key in ['invoice_terms', 'invoice_footer'] %}
+        <textarea name="{{ key }}" rows="4" class="input">{{ data.get(key, '') }}</textarea>
+        {% else %}
+        <input type="text" name="{{ key }}" value="{{ data.get(key, '') }}" class="input">
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card p-6 space-y-4">
+      <h2 class="text-sm font-bold text-slate-800">Homepage Hero</h2>
+      <div>
+        <label class="label">Hero Headline (shown on home page)</label>
+        <textarea name="home_hero_title" rows="2" class="input">{{ data.get('home_hero_title', '') }}</textarea>
+      </div>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="show_service_prices_public" value="1"
+               class="h-4 w-4 rounded border-slate-300 text-brand-600"
+               {% if data.get('show_service_prices_public') %}checked{% endif %}>
+        Show service prices on public website
+      </label>
+    </div>
+
+    <button type="submit" class="btn-primary">Save All Settings</button>
+  </div>
+</form>
+
+<div class="mt-8 flex flex-wrap gap-3 no-print">
+  <a href="{{ url_for('settings.content') }}" class="btn-secondary text-sm">&#128196; Website Content Blocks</a>
+  <a href="{{ url_for('settings.faqs') }}" class="btn-secondary text-sm">&#10067; FAQs</a>
+  <a href="{{ url_for('settings.banners') }}" class="btn-secondary text-sm">&#127916; Banners</a>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% block title %}Payments — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Payments</h1>
+
+<form method="get" class="card mt-4 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+  <select name="method" class="input">
+    <option value="">All Methods</option>
+    {% for v, l in methods %}<option value="{{ v }}" {% if filters.method == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+  </select>
+  <div class="flex gap-2 lg:col-span-2">
+    <input type="date" name="from" value="{{ filters.from }}" class="input flex-1" title="From">
+    <span class="self-center text-slate-400">to</span>
+    <input type="date" name="to" value="{{ filters.to }}" class="input flex-1" title="To">
+  </div>
+  <button class="btn-primary px-3">Filter</button>
+</form>
+
+<div class="mt-4 card p-5 bg-emerald-50 border-emerald-200">
+  <p class="text-xs uppercase font-bold text-emerald-700">Total Collected (filtered)</p>
+  <p class="text-2xl font-extrabold text-emerald-800">{{ inr(total) }}</p>
+</div>
+
+<div class="card mt-4 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead><tr><th>Date/Time</th><th>Invoice</th><th>Patient</th><th>Amount (₹)</th><th>Method</th><th>Received By</th></tr></thead>
+      <tbody>
+        {% for p in pagination.items %}
+        <tr onclick="window.location='{{ url_for('invoices.view', invoice_id=p.invoice_id) }}'" class="cursor-pointer hover:bg-slate-50">
+          <td class="text-xs">{{ fmt_datetime(p.paid_at) }}</td>
+          <td class="font-mono text-xs">{{ p.invoice.invoice_code if p.invoice }}</td>
+          <td>{{ p.invoice.patient.full_name if p.invoice and p.invoice.patient else '—' }}</td>
+          <td class="font-semibold text-emerald-700">{{ inr(p.amount) }}</td>
+          <td><span class="badge bg-slate-100 text-slate-600">{{ p.method_label }}</span></td>
+          <td class="text-xs">{{ p.received_by.full_name if p.received_by else '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-400">No payments found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "admin/_pagination.html" %}
+</div>
+{% endblock %}

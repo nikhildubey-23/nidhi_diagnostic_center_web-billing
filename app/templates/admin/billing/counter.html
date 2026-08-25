@@ -1,0 +1,65 @@
+{% extends "admin/base.html" %}
+{% block title %}Billing Counter — {{ center_name() }}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-slate-900">Billing Counter</h1>
+<p class="mt-1 text-sm text-slate-500">Search for an existing patient or create a new one, then generate an invoice.</p>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-5" x-data="{tab:'search',newTab:false}">
+  <!-- Patient search -->
+  <div class="lg:col-span-3 card p-6" x-show="tab==='search'||tab==='new'">
+    <form method="get" action="{{ url_for('billing.counter') }}" class="flex gap-2">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search name, mobile, patient code..." class="input flex-1" autofocus>
+      <button type="submit" class="btn-primary">Search</button>
+    </form>
+
+    {% if patients %}
+    <div class="mt-4 space-y-2">
+      {% for p in patients %}
+      <div class="flex items-center justify-between rounded-lg border border-slate-200 p-3 hover:border-brand-300 hover:bg-brand-50/50 transition">
+        <div>
+          <p class="font-semibold text-slate-800">{{ p.full_name }} <span class="text-xs text-slate-400">{{ p.patient_code }}</span></p>
+          <p class="text-xs text-slate-500">{{ p.mobile }} &middot; {{ p.gender }} &middot; {{ p.display_age }}</p>
+        </div>
+        <a href="{{ url_for('billing.new_invoice', patient_id=p.id) }}" class="btn-primary text-xs">Bill Patient</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif q %}
+    <p class="mt-4 text-sm text-slate-500">No patients found. <button type="button" @click="tab='new';newTab=true" class="text-brand-700 font-semibold hover:underline">Create new patient?</button></p>
+    {% endif %}
+  </div>
+
+  <!-- New patient form -->
+  <div class="lg:col-span-2 card p-6" x-show="tab!=='search'||newTab">
+    <h2 class="text-sm font-bold text-slate-800">New Patient</h2>
+    <form method="post" action="{{ url_for('billing.create_patient') }}" class="mt-4 space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div>
+        <label class="label">Full Name *</label>
+        <input name="full_name" required maxlength="128" class="input">
+      </div>
+      <div>
+        <label class="label">Mobile Number *</label>
+        <input name="mobile" required pattern="[6-9][0-9]{9}" inputmode="numeric" class="input">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="label">Age</label>
+          <input name="age" type="number" min="0" max="120" class="input">
+        </div>
+        <div>
+          <label class="label">Gender *</label>
+          <select name="gender" class="input" required>
+            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="label">Address</label>
+        <textarea name="address" rows="2" class="input"></textarea>
+      </div>
+      <button type="submit" class="btn-primary w-full">Create &amp; Start Billing</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
