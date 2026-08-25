@@ -35,11 +35,8 @@ class Config:
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_DURATION = timedelta(hours=12)
 
-    # Rate limiting — Upstash Redis (Vercel-compatible)
-    RATELIMIT_STORAGE_URI = os.environ.get(
-        "UPSTASH_REDIS_URL",
-        os.environ.get("RATELIMIT_STORAGE_URI", "memory://"),
-    )
+    # Rate limiting — memory by default, Redis if UPSTASH_REDIS_URL works
+    RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
     RATELIMIT_DEFAULT = "200 per hour"
 
     # Uploads

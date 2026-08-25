@@ -74,3 +74,22 @@ def init_session(app):
         app.logger.warning("Flask-Session: Read-only filesystem, skipping file sessions")
     except Exception:
         pass
+
+
+def init_rate_limiter(app):
+    """Configure rate limiter — try Redis, fall back to memory."""
+    storage_uri = app.config.get("RATELIMIT_STORAGE_URI", "memory://")
+
+    if storage_uri != "memory://":
+        r = _get_redis_client(app)
+        if r is not None:
+            try:
+                r.ping()
+                app.config["RATELIMIT_STORAGE_URI"] = storage_uri
+                app.logger.info(f"Rate limiter: Using Redis")
+                return
+            except Exception as e:
+                app.logger.warning(f"Rate limiter Redis failed: {e}, falling back to memory")
+
+    app.config["RATELIMIT_STORAGE_URI"] = "memory://"
+    app.logger.info("Rate limiter: Using memory")

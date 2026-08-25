@@ -47,8 +47,9 @@ def create_app(config_name: str | None = None) -> Flask:
     _configure_logging(app)
 
     # -- extensions -------------------------------------------------------
-    from app.extensions import db, csrf, login_manager, limiter, migrate, init_session
+    from app.extensions import db, csrf, login_manager, limiter, migrate, init_session, init_rate_limiter
 
+    init_rate_limiter(app)
     db.init_app(app)
     migrate.init_app(app, db, compare_type=True)
     login_manager.init_app(app)
