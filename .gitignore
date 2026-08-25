@@ -1,0 +1,61 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+
+# uploads (user-generated content)
+uploads/
+
+# Logs
+logs/
+*.log
+
+# Node.js (Tailwind build tooling only)
+node_modules/
+package-lock.json
+
+# Tailwind build output
+app/static/css/app.css
+app/static/js/app.js
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# pytest
+.pytest_cache/
+
+# Flask
+instance/
+
+# Compiled files
+*.so
+*.pyd
+
+# Distribution
+*.tar.gz
+*.whl
