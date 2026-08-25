@@ -9,11 +9,14 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/app/static/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "wsgi.py"
     }
   ],
-  "outputDirectory": "app",
   "env": {
     "FLASK_CONFIG": "production"
   }
