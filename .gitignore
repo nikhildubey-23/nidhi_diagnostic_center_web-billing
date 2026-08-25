@@ -33,9 +33,10 @@ logs/
 node_modules/
 package-lock.json
 
-# Tailwind build output
-app/static/css/app.css
-app/static/js/app.js
+# Tailwind/JS build output — tracked for Vercel deployment
+# (uncomment below line if you prefer to build on Vercel instead)
+# app/static/css/app.css
+# app/static/js/app.js
 
 # IDE / editor
 .vscode/

@@ -28,7 +28,6 @@ class Config:
     # Sessions — Redis (Upstash) in production, filesystem in dev
     SESSION_TYPE = os.environ.get("SESSION_TYPE", "redis")
     UPSTASH_REDIS_URL = os.environ.get("UPSTASH_REDIS_URL", "")
-    RATELIMIT_STORAGE_URI = os.environ.get("UPSTASH_REDIS_URL", "")
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"

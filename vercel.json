@@ -17,7 +17,6 @@
       "dest": "wsgi.py"
     }
   ],
-  "outputDirectory": "app",
   "env": {
     "FLASK_CONFIG": "production"
   }
