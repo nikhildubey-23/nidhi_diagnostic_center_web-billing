@@ -42,7 +42,12 @@ def _configure_logging(app: Flask):
 
 def create_app(config_name: str | None = None) -> Flask:
     config_name = config_name or os.environ.get("FLASK_CONFIG", "production")
-    app = Flask(__name__, instance_relative_config=False)
+    app = Flask(
+        __name__,
+        instance_relative_config=False,
+        static_folder=os.path.join(os.path.dirname(__file__), "static"),
+        static_url_path="/static",
+    )
     app.config.from_object(config_by_name[config_name])
     _configure_logging(app)
 
