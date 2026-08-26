@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Hero -->
-<section class="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 text-white">
+<section class="relative overflow-x-clip bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 text-white">
   <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 30%, white 1px, transparent 1px); background-size: 28px 28px;"></div>
   <div class="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-10 sm:py-16 lg:grid-cols-2 lg:py-24">
     <div>
@@ -29,7 +29,7 @@
     <div class="rounded-2xl bg-white p-6 shadow-2xl text-slate-800 sm:p-8">
       <h2 class="text-lg font-bold text-slate-900">Quick Appointment Request</h2>
       <p class="mt-1 text-sm text-slate-500">Fill this short form — our staff will call you to confirm.</p>
-      <form method="post" action="{{ url_for('website.book') }}" class="mt-5 space-y-4">
+      <form method="post" action="{{ url_for('website.book_quick') }}" class="mt-5 space-y-4">
         {{ form.hidden_tag() }}
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="sm:col-span-2">

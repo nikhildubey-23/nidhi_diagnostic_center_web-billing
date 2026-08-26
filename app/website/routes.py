@@ -1,5 +1,6 @@
 """Public website routes."""
 import logging
+import re as _re
 from datetime import date, datetime
 
 from flask import (
@@ -193,6 +194,70 @@ def book():
 
     return render_template("website/book.html", form=form, services=active_services,
                            today=date.today())
+
+
+@website_bp.route("/book/quick", methods=["POST"])
+@limiter.limit("8 per hour", methods=["POST"])
+def book_quick():
+    """Handle the Quick Appointment Request from the home page hero."""
+    patient_name = (request.form.get("patient_name") or "").strip()
+    mobile = (request.form.get("mobile") or "").strip()
+    service_id = request.form.get("service_id", type=int)
+    preferred_date_raw = (request.form.get("preferred_date") or "").strip()
+    preferred_time = (request.form.get("preferred_time") or "").strip()
+
+    if not patient_name or len(patient_name) < 2:
+        flash("Please enter your full name.", "danger")
+        return redirect(url_for("website.home"))
+    if not mobile or not _re.match(r"^[6-9]\d{9}$", mobile):
+        flash("Please enter a valid 10-digit Indian mobile number.", "danger")
+        return redirect(url_for("website.home"))
+    if not service_id:
+        flash("Please choose a test/service.", "danger")
+        return redirect(url_for("website.home"))
+
+    svc = db.session.get(Service, service_id)
+    if svc is None or not svc.is_active:
+        flash("Please choose a valid service/test.", "danger")
+        return redirect(url_for("website.home"))
+
+    try:
+        pref_date = date.fromisoformat(preferred_date_raw)
+    except (ValueError, TypeError):
+        flash("Please enter a valid preferred date.", "danger")
+        return redirect(url_for("website.home"))
+
+    if pref_date < date.today():
+        flash("Preferred date cannot be in the past.", "danger")
+        return redirect(url_for("website.home"))
+
+    booking = Booking(
+        patient_name=patient_name,
+        mobile=mobile,
+        service_id=svc.id,
+        preferred_date=pref_date,
+        status="pending",
+        source="website",
+    )
+    if preferred_time:
+        try:
+            booking.preferred_time = datetime.strptime(preferred_time, "%H:%M").time()
+        except ValueError:
+            pass
+
+    booking.booking_code = next_booking_code()
+    db.session.add(booking)
+    db.session.flush()
+    notify_booking_received(booking)
+    try:
+        from app.services.notifications import deliver_pending
+        deliver_pending(limit=5)
+    except Exception:
+        current_app.logger.exception("Notification delivery failed")
+    log_audit("booking_created", "booking", booking.id,
+              {"code": booking.booking_code, "source": "website"})
+    db.session.commit()
+    return redirect(url_for("website.book_success", code=booking.booking_code))
 
 
 @website_bp.route("/book/success/<code>")
