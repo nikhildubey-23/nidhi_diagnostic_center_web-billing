@@ -38,6 +38,11 @@
   }
 }
 
+/* Use dynamic viewport height where supported (mobile browser URL bars) */
+@supports (height: 100dvh) {
+  .h-screen { height: 100dvh; }
+}
+
 @media print {
   body * { visibility: hidden; }
   #print-area, #print-area * { visibility: visible; }

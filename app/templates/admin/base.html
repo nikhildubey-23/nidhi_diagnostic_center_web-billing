@@ -1,19 +1,26 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="flex h-screen bg-slate-100" x-data="{sidebar: true}">
+<div class="flex h-screen bg-slate-100" x-data="{ sidebar: window.innerWidth >= 1024 }"
+     @resize.window="sidebar = window.innerWidth >= 1024"
+     @keydown.escape.window="if (window.innerWidth < 1024) sidebar = false">
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-slate-200 bg-brand-950 text-slate-200 transition-transform duration-300 ease-in-out lg:translate-x-0"
          :class="sidebar ? 'translate-x-0' : '-translate-x-full'">
     <!-- Logo -->
-    <div class="flex h-14 items-center gap-2 border-b border-white/10 px-4">
-      <span class="flex h-8 w-8 items-center justify-center rounded bg-brand-700 text-xs font-bold text-white">ND</span>
-      <span class="truncate text-sm font-bold text-white">{{ center_name() }}</span>
+    <div class="flex h-14 items-center justify-between gap-2 border-b border-white/10 px-4">
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="flex h-8 w-8 flex-none items-center justify-center rounded bg-brand-700 text-xs font-bold text-white">ND</span>
+        <span class="truncate text-sm font-bold text-white">{{ center_name() }}</span>
+      </div>
+      <button class="rounded p-1.5 text-slate-400 hover:bg-white/10 hover:text-white lg:hidden" @click="sidebar = false" aria-label="Close sidebar">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
 
     <nav class="flex-1 space-y-0.5 overflow-y-auto p-3 text-sm">
       {% macro nav_item(href, label, icon, perm='dashboard.view') -%}
         {% if current_user.has_permission(perm) %}
-        <a href="{{ href }}" class="flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition
+        <a href="{{ href }}" @click="if (window.innerWidth < 1024) sidebar = false" class="flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition
           {% if request.path.rstrip('/') == href.rstrip('/') %}bg-brand-700 text-white{% else %}text-slate-300 hover:bg-white/5 hover:text-white{% endif %}">
           <span class="text-base">{{ icon | safe }}</span>{{ label }}
         </a>
