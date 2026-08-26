@@ -13,18 +13,18 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Code</th><th>Name</th><th>Mobile</th><th>Gender</th><th>Age</th><th>Registered</th><th></th></tr></thead>
       <tbody>
         {% for p in pagination.items %}
         <tr onclick="window.location='{{ url_for('patients.profile', patient_id=p.id) }}'" class="cursor-pointer hover:bg-slate-50">
-          <td class="font-mono text-xs">{{ p.patient_code }}</td>
-          <td class="font-medium">{{ p.full_name }}</td>
-          <td>{{ p.mobile }}</td>
-          <td class="text-sm capitalize">{{ p.gender }}</td>
-          <td>{{ p.display_age }}</td>
-          <td class="text-xs text-slate-500">{{ fmt_date(p.created_at) }}</td>
-          <td class="text-right"><a href="{{ url_for('patients.profile', patient_id=p.id) }}" class="text-xs font-semibold text-brand-700 hover:underline" onclick="event.stopPropagation()">Open &rarr;</a></td>
+          <td data-label="Code" class="font-mono text-xs">{{ p.patient_code }}</td>
+          <td data-label="Name" class="font-medium">{{ p.full_name }}</td>
+          <td data-label="Mobile">{{ p.mobile }}</td>
+          <td data-label="Gender" class="text-sm capitalize">{{ p.gender }}</td>
+          <td data-label="Age">{{ p.display_age }}</td>
+          <td data-label="Registered" class="text-xs text-slate-500">{{ fmt_date(p.created_at) }}</td>
+          <td data-label=" " class="text-right"><a href="{{ url_for('patients.profile', patient_id=p.id) }}" class="text-xs font-semibold text-brand-700 hover:underline" onclick="event.stopPropagation()">Open &rarr;</a></td>
         </tr>
         {% else %}
         <tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-400">{% if q %}No patients match "{{ q }}".{% else %}No patients yet.{% endif %}</td></tr>

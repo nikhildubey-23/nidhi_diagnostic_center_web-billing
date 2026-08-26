@@ -20,18 +20,18 @@
       <a href="{{ url_for('services.edit_category', cat_id=cat.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit Category</a>
     </div>
     <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Code</th><th>Name</th><th>Price (₹)</th><th>Tax %</th><th>Duration</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
       <tbody>
         {% for s in rows %}
         <tr>
-          <td class="font-mono text-xs">{{ s.code }}</td>
-          <td class="font-medium">{{ s.name }}</td>
-          <td>{{ '{:,.2f}'.format(s.price|float) }}</td>
-          <td>{{ s.tax_percent or 0 }}</td>
-          <td>{{ s.duration_minutes }} min</td>
-          <td><span class="badge {{ 'bg-emerald-50 text-emerald-700' if s.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if s.is_active else 'Inactive' }}</span></td>
-          <td class="text-right space-x-3">
+          <td data-label="Code" class="font-mono text-xs">{{ s.code }}</td>
+          <td data-label="Name" class="font-medium">{{ s.name }}</td>
+          <td data-label="Price">{{ '{:,.2f}'.format(s.price|float) }}</td>
+          <td data-label="Tax %">{{ s.tax_percent or 0 }}</td>
+          <td data-label="Duration">{{ s.duration_minutes }} min</td>
+          <td data-label="Status"><span class="badge {{ 'bg-emerald-50 text-emerald-700' if s.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if s.is_active else 'Inactive' }}</span></td>
+          <td data-label="Actions" class="text-right space-x-3">
             <a href="{{ url_for('services.edit_service', svc_id=s.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a>
             <form method="post" action="{{ url_for('services.toggle_service', svc_id=s.id) }}" class="inline">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

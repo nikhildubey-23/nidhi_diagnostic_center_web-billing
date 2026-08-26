@@ -42,11 +42,11 @@
   <div class="card overflow-hidden">
     <div class="border-b bg-slate-50 px-5 py-2.5"><h2 class="text-sm font-bold text-slate-800">Category-wise Sales</h2></div>
     <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Category</th><th>Items Sold</th><th>Sales (₹)</th></tr></thead>
       <tbody>
         {% for row in category_breakdown %}
-        <tr><td>{{ row.name }}</td><td>{{ row.items }}</td><td class="font-mono">{{ inr(row.sales) }}</td></tr>
+        <tr><td data-label="Category">{{ row.name }}</td><td data-label="Items Sold">{{ row.items }}</td><td data-label="Sales" class="font-mono">{{ inr(row.sales) }}</td></tr>
         {% else %}<tr><td colspan="3" class="px-4 py-6 text-center text-sm text-slate-400">No sales in this period.</td></tr>{% endfor %}
       </tbody>
     </table>
@@ -57,11 +57,11 @@
   <div class="card overflow-hidden">
     <div class="border-b bg-slate-50 px-5 py-2.5"><h2 class="text-sm font-bold text-slate-800">Payment Methods</h2></div>
     <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Method</th><th>Transactions</th><th>Amount (₹)</th></tr></thead>
       <tbody>
         {% for row in method_breakdown %}
-        <tr><td>{{ row.method }}</td><td>{{ row.count }}</td><td class="font-mono">{{ inr(row.amount) }}</td></tr>
+        <tr><td data-label="Method">{{ row.method }}</td><td data-label="Transactions">{{ row.count }}</td><td data-label="Amount" class="font-mono">{{ inr(row.amount) }}</td></tr>
         {% else %}<tr><td colspan="3" class="px-4 py-6 text-center text-sm text-slate-400">No payments in this period.</td></tr>{% endfor %}
       </tbody>
     </table>

@@ -6,16 +6,16 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Invoice #</th><th>Patient</th><th>Created</th><th>Total (₹)</th><th class="text-right">Actions</th></tr></thead>
       <tbody>
         {% for i in pagination.items %}
         <tr>
-          <td class="font-mono text-xs">{{ i.invoice_code }}</td>
-          <td>{{ i.patient.full_name if i.patient else '—' }}<span class="block text-xs text-slate-400">{{ i.patient.mobile if i.patient }}</span></td>
-          <td>{{ fmt_datetime(i.created_at) }}</td>
-          <td>{{ inr(i.grand_total) }}</td>
-          <td class="text-right space-x-3">
+          <td data-label="Invoice #" class="font-mono text-xs">{{ i.invoice_code }}</td>
+          <td data-label="Patient">{{ i.patient.full_name if i.patient else '—' }}<span class="block text-xs text-slate-400">{{ i.patient.mobile if i.patient }}</span></td>
+          <td data-label="Created">{{ fmt_datetime(i.created_at) }}</td>
+          <td data-label="Total">{{ inr(i.grand_total) }}</td>
+          <td data-label="Actions" class="text-right space-x-3">
             <a href="{{ url_for('invoices.edit_draft', invoice_id=i.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a>
             <a href="{{ url_for('invoices.view', invoice_id=i.id) }}" class="text-xs font-semibold text-slate-600 hover:underline">View</a>
           </td>

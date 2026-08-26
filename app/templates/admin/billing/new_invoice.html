@@ -47,7 +47,7 @@
         <p class="text-xs text-slate-500">Set quantity for items to include. Prices come from the service catalogue.</p>
       </div>
       <div class="overflow-x-auto">
-        <table class="table-base" id="svcTable">
+        <table class="table-base table-responsive" id="svcTable">
           <thead>
             <tr>
               <th class="w-8"></th>
@@ -63,23 +63,23 @@
           <tbody>
             {% for svc in services %}
             <tr data-id="{{ svc.id }}" data-rate="{{ svc.price }}" data-tax="{{ svc.tax_percent or 0 }}" data-de="{{ 1 if svc.discount_eligible else 0 }}">
-              <td class="text-center">
+              <td data-label="Add" class="text-center">
                 <input type="hidden" name="add_{{ svc.id }}" value="">
                 <input type="checkbox" name="add_{{ svc.id }}" value="1"
                        class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 svc-check"
                        onchange="toggleRow(this)">
               </td>
-              <td class="font-medium">{{ svc.name }} <span class="text-[10px] text-slate-400">{{ svc.code }}</span></td>
-              <td class="text-xs text-slate-500">{{ svc.category.name }}</td>
-              <td class="rate-cell text-right font-mono">{{ '{:,.2f}'.format(svc.price|float) }}</td>
-              <td class="w-16">
+              <td data-label="Service" class="font-medium">{{ svc.name }} <span class="text-[10px] text-slate-400">{{ svc.code }}</span></td>
+              <td data-label="Category" class="text-xs text-slate-500">{{ svc.category.name }}</td>
+              <td data-label="Rate" class="rate-cell text-right font-mono">{{ '{:,.2f}'.format(svc.price|float) }}</td>
+              <td data-label="Qty" class="w-16">
                 <input type="number" name="qty_{{ svc.id }}" min="0" max="20" value="0" class="input w-16 text-center text-sm qty-input" onchange="recalcRow(this)">
               </td>
-              <td class="w-20">
+              <td data-label="Discount" class="w-20">
                 <input type="number" name="discount_{{ svc.id }}" min="0" step="0.01" value="0" class="input w-20 text-center text-sm disc-input" onchange="recalcRow(this)">
               </td>
-              <td class="tax-cell text-xs text-slate-500">{{ svc.tax_percent or 0 }}%</td>
-              <td class="line-total font-mono text-sm font-semibold text-right">0.00</td>
+              <td data-label="Tax" class="tax-cell text-xs text-slate-500">{{ svc.tax_percent or 0 }}%</td>
+              <td data-label="Line Total" class="line-total font-mono text-sm font-semibold text-right">0.00</td>
             </tr>
             {% endfor %}
           </tbody>

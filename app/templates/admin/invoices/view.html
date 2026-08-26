@@ -75,18 +75,18 @@
 
     <!-- Services table -->
     <div class="overflow-x-auto">
-      <table class="table-base">
+      <table class="table-base table-responsive">
         <thead><tr><th>#</th><th>Service</th><th>Qty</th><th class="text-right">Rate (₹)</th><th class="text-right">Discount (₹)</th><th class="text-right">Tax %</th><th class="text-right">Amount (₹)</th></tr></thead>
         <tbody>
           {% for item in invoice.items %}
           <tr>
-            <td>{{ loop.index }}</td>
-            <td class="font-medium">{{ item.service_name_snapshot }}</td>
-            <td class="text-center">{{ item.qty }}</td>
-            <td class="text-right font-mono">{{ '{:,.2f}'.format(item.rate|float) }}</td>
-            <td class="text-right font-mono">{{ '{:,.2f}'.format(item.discount_amount|float) }}</td>
-            <td class="text-center text-xs">{{ item.tax_percent }}%</td>
-            <td class="text-right font-mono font-semibold">{{ '{:,.2f}'.format(item.line_total|float) }}</td>
+            <td data-label="#" class="text-xs">{{ loop.index }}</td>
+            <td data-label="Service" class="font-medium">{{ item.service_name_snapshot }}</td>
+            <td data-label="Qty" class="text-center">{{ item.qty }}</td>
+            <td data-label="Rate" class="text-right font-mono">{{ '{:,.2f}'.format(item.rate|float) }}</td>
+            <td data-label="Discount" class="text-right font-mono">{{ '{:,.2f}'.format(item.discount_amount|float) }}</td>
+            <td data-label="Tax" class="text-center text-xs">{{ item.tax_percent }}%</td>
+            <td data-label="Amount" class="text-right font-mono font-semibold">{{ '{:,.2f}'.format(item.line_total|float) }}</td>
           </tr>
           {% endfor %}
         </tbody>

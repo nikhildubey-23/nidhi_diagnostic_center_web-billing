@@ -8,16 +8,16 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th class="text-right">Actions</th></tr></thead>
       <tbody>
         {% for u in users %}
         <tr>
-          <td class="font-mono font-medium">{{ u.username }}</td>
-          <td>{{ u.full_name }}</td>
-          <td class="text-sm">{{ u.email }}</td>
-          <td><span class="badge bg-brand-50 text-brand-700">{{ u.role.label if u.role else u.role_name }}</span></td>
-          <td>
+          <td data-label="Username" class="font-mono font-medium">{{ u.username }}</td>
+          <td data-label="Full Name">{{ u.full_name }}</td>
+          <td data-label="Email" class="text-sm">{{ u.email }}</td>
+          <td data-label="Role"><span class="badge bg-brand-50 text-brand-700">{{ u.role.label if u.role else u.role_name }}</span></td>
+          <td data-label="Status">
             {% if u.is_locked %}
             <span class="badge bg-red-50 text-red-700">Locked</span>
             {% elif u.is_active %}
@@ -26,8 +26,8 @@
             <span class="badge bg-slate-100 text-slate-500">Inactive</span>
             {% endif %}
           </td>
-          <td class="text-xs">{{ fmt_datetime(u.last_login_at) if u.last_login_at else 'Never' }}</td>
-          <td class="text-right space-x-3">
+          <td data-label="Last Login" class="text-xs">{{ fmt_datetime(u.last_login_at) if u.last_login_at else 'Never' }}</td>
+          <td data-label="Actions" class="text-right space-x-3">
             <a href="{{ url_for('users.edit', user_id=u.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a>
             {% if u.id != current_user.id %}
             <form method="post" action="{{ url_for('users.toggle', user_id=u.id) }}" class="inline">

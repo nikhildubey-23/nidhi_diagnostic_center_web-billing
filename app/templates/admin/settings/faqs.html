@@ -8,15 +8,15 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-  <table class="table-base">
+  <table class="table-base table-responsive">
     <thead><tr><th>Question</th><th>Answer</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
     <tbody>
       {% for row in rows %}
       <tr>
-        <td class="font-medium">{{ row.question }}</td>
-        <td class="max-w-md truncate text-sm text-slate-500">{{ row.answer }}</td>
-        <td><span class="badge {{ 'bg-emerald-50 text-emerald-700' if row.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if row.is_active else 'Hidden' }}</span></td>
-        <td class="text-right space-x-3">
+        <td data-label="Question" class="font-medium">{{ row.question }}</td>
+        <td data-label="Answer" class="max-w-md truncate text-sm text-slate-500">{{ row.answer }}</td>
+        <td data-label="Status"><span class="badge {{ 'bg-emerald-50 text-emerald-700' if row.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if row.is_active else 'Hidden' }}</span></td>
+        <td data-label="Actions" class="text-right space-x-3">
           <a href="{{ url_for('settings.edit_faq', faq_id=row.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a>
           <form method="post" action="{{ url_for('settings.delete_faq', faq_id=row.id) }}" class="inline"
                 onsubmit="return confirm('Delete this FAQ?')">

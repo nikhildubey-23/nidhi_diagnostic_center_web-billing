@@ -34,16 +34,16 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Key</th><th>Title</th><th>Content</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
       <tbody>
         {% for row in rows %}
         <tr>
-          <td class="font-mono text-xs">{{ row.key }}</td>
-          <td class="font-medium">{{ row.title }}</td>
-          <td class="max-w-md truncate text-sm text-slate-500">{{ row.body }}</td>
-          <td><span class="badge {{ 'bg-emerald-50 text-emerald-700' if row.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if row.is_active else 'Hidden' }}</span></td>
-          <td class="text-right"><a href="{{ url_for('settings.edit_content', row_id=row.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a></td>
+          <td data-label="Key" class="font-mono text-xs">{{ row.key }}</td>
+          <td data-label="Title" class="font-medium">{{ row.title }}</td>
+          <td data-label="Content" class="max-w-md truncate text-sm text-slate-500">{{ row.body }}</td>
+          <td data-label="Status"><span class="badge {{ 'bg-emerald-50 text-emerald-700' if row.is_active else 'bg-slate-100 text-slate-500' }}">{{ 'Active' if row.is_active else 'Hidden' }}</span></td>
+          <td data-label="Actions" class="text-right"><a href="{{ url_for('settings.edit_content', row_id=row.id) }}" class="text-xs font-semibold text-brand-700 hover:underline">Edit</a></td>
         </tr>
         {% else %}
         <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-400">No content blocks yet.</td></tr>

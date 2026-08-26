@@ -38,28 +38,28 @@
 <!-- Register table -->
 <div class="card mt-4 overflow-hidden" id="print-area">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Time</th><th>Invoice #</th><th>Patient</th><th>Services</th><th>Invoice Amt</th><th>Paid (₹)</th><th>Method</th><th>Staff</th></tr></thead>
       <tbody>
         {% for e in entries %}
         <tr class="hover:bg-slate-50 cursor-pointer" {% if e.invoice_id %}onclick="window.location='{{ url_for('invoices.view', invoice_id=e.invoice_id) }}'"{% endif %}>
-          <td class="whitespace-nowrap text-xs">{{ e.time }}</td>
-          <td class="font-mono text-xs">{{ e.invoice }}</td>
-          <td>{{ e.patient }}<span class="block text-[11px] text-slate-400">{{ e.patient_code }}</span></td>
-          <td class="max-w-48 truncate text-xs text-slate-500" title="{{ e.services }}">{{ e.services or '—' }}</td>
-          <td>{{ inr(e.invoice_amount) }}</td>
-          <td class="font-semibold text-emerald-700">{{ inr(e.paid_amount) }}</td>
-          <td><span class="badge bg-slate-100 text-slate-600">{{ e.method }}</span></td>
-          <td class="text-xs">{{ e.staff }}</td>
+          <td data-label="Time" class="whitespace-nowrap text-xs">{{ e.time }}</td>
+          <td data-label="Invoice #" class="font-mono text-xs">{{ e.invoice }}</td>
+          <td data-label="Patient">{{ e.patient }}<span class="block text-[11px] text-slate-400">{{ e.patient_code }}</span></td>
+          <td data-label="Services" class="max-w-48 truncate text-xs text-slate-500" title="{{ e.services }}">{{ e.services or '—' }}</td>
+          <td data-label="Invoice Amt">{{ inr(e.invoice_amount) }}</td>
+          <td data-label="Paid" class="font-semibold text-emerald-700">{{ inr(e.paid_amount) }}</td>
+          <td data-label="Method"><span class="badge bg-slate-100 text-slate-600">{{ e.method }}</span></td>
+          <td data-label="Staff" class="text-xs">{{ e.staff }}</td>
         </tr>
         {% else %}
         <tr><td colspan="8" class="px-4 py-8 text-center text-sm text-slate-400">No payments collected on this date.</td></tr>
         {% endfor %}
         {% if entries %}
         <tr class="bg-slate-50 font-bold">
-          <td colspan="5" class="text-right uppercase text-xs">Total</td>
-          <td class="font-mono text-emerald-800">{{ inr(total) }}</td>
-          <td colspan="2"></td>
+          <td colspan="5" class="hidden md:table-cell text-right uppercase text-xs">Total</td>
+          <td data-label="Total" class="font-mono text-emerald-800">{{ inr(total) }}</td>
+          <td colspan="2" class="hidden md:table-cell"></td>
         </tr>
         {% endif %}
       </tbody>

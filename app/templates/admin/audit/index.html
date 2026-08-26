@@ -41,16 +41,16 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead>
       <tbody>
         {% for a in pagination.items %}
         <tr>
-          <td class="whitespace-nowrap text-xs">{{ fmt_datetime(a.created_at) }}</td>
-          <td>{{ a.user.full_name if a.user else 'System' }}</td>
-          <td><span class="badge bg-slate-100 text-slate-600">{{ action_icons.get(a.action, '&#128196;') | safe }} {{ a.action }}</span></td>
-          <td class="text-sm">{{ a.entity_type }}{% if a.entity_id %} #{{ a.entity_id }}{% endif %}</td>
-          <td class="max-w-md"><code class="block truncate rounded bg-slate-50 px-2 py-1 text-[11px] text-slate-500" title="{{ a.details }}">{{ a.details or '—' }}</code></td>
+          <td data-label="Time" class="whitespace-nowrap text-xs">{{ fmt_datetime(a.created_at) }}</td>
+          <td data-label="User">{{ a.user.full_name if a.user else 'System' }}</td>
+          <td data-label="Action"><span class="badge bg-slate-100 text-slate-600">{{ action_icons.get(a.action, '&#128196;') | safe }} {{ a.action }}</span></td>
+          <td data-label="Entity" class="text-sm">{{ a.entity_type }}{% if a.entity_id %} #{{ a.entity_id }}{% endif %}</td>
+          <td data-label="Details" class="max-w-md"><code class="block truncate rounded bg-slate-50 px-2 py-1 text-[11px] text-slate-500" title="{{ a.details }}">{{ a.details or '—' }}</code></td>
         </tr>
         {% else %}
         <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-400">No audit entries found.</td></tr>

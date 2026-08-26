@@ -19,18 +19,18 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Invoice #</th><th>Patient</th><th>Date</th><th>Total (₹)</th><th>Paid (₹)</th><th>Balance (₹)</th><th>Status</th></tr></thead>
       <tbody>
         {% for i in pagination.items %}
         <tr onclick="window.location='{{ url_for('invoices.view', invoice_id=i.id) }}'" class="cursor-pointer hover:bg-slate-50">
-          <td class="font-mono text-xs">{{ i.invoice_code }}</td>
-          <td>{{ i.patient.full_name if i.patient else '—' }}<span class="block text-xs text-slate-400">{{ i.patient.mobile if i.patient }}</span></td>
-          <td>{{ fmt_date(i.created_at) }}</td>
-          <td>{{ inr(i.grand_total) }}</td>
-          <td class="text-emerald-700">{{ inr(i.amount_paid) }}</td>
-          <td class="{% if i.balance_amount|float > 0 %}font-semibold text-red-600{% else %}text-slate-400{% endif %}">{{ inr(i.balance_due) if i.balance_amount|float > 0 else '0.00' }}</td>
-          <td>
+          <td data-label="Invoice #" class="font-mono text-xs">{{ i.invoice_code }}</td>
+          <td data-label="Patient">{{ i.patient.full_name if i.patient else '—' }}<span class="block text-xs text-slate-400">{{ i.patient.mobile if i.patient }}</span></td>
+          <td data-label="Date">{{ fmt_date(i.created_at) }}</td>
+          <td data-label="Total">{{ inr(i.grand_total) }}</td>
+          <td data-label="Paid" class="text-emerald-700">{{ inr(i.amount_paid) }}</td>
+          <td data-label="Balance" class="{% if i.balance_amount|float > 0 %}font-semibold text-red-600{% else %}text-slate-400{% endif %}">{{ inr(i.balance_due) if i.balance_amount|float > 0 else '0.00' }}</td>
+          <td data-label="Status">
             {% set cls = {'draft':'bg-slate-100 text-slate-600','finalized':'bg-blue-50 text-blue-700','partially_paid':'bg-amber-50 text-amber-700','paid':'bg-emerald-50 text-emerald-700','cancelled':'bg-red-50 text-red-700'} %}
             <span class="badge {{ cls.get(i.status,'bg-slate-100') }}">{{ i.status_label }}</span>
           </td>

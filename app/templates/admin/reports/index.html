@@ -18,17 +18,17 @@
 
 <div class="card mt-4 overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="table-base">
+    <table class="table-base table-responsive">
       <thead><tr><th>Title</th><th>Patient</th><th>Service</th><th>Report Date</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
       <tbody>
         {% for r in pagination.items %}
         <tr onclick="window.location='{{ url_for('reports.detail', report_id=r.id) }}'" class="cursor-pointer hover:bg-slate-50">
-          <td class="font-medium">{{ r.title }}</td>
-          <td>{{ r.patient.full_name }}<span class="block text-xs text-slate-400">{{ r.patient.patient_code }}</span></td>
-          <td class="text-sm">{{ r.service.name if r.service else '—' }}</td>
-          <td>{{ fmt_date(r.report_date) }}</td>
-          <td><span class="badge {{ 'bg-emerald-50 text-emerald-700' if r.status == 'completed' else 'bg-amber-50 text-amber-700' }}">{{ r.status|capitalize }}</span></td>
-          <td class="text-right"><a href="{{ url_for('reports.detail', report_id=r.id) }}" class="text-xs font-semibold text-brand-700 hover:underline" onclick="event.stopPropagation()">Open &rarr;</a></td>
+          <td data-label="Title" class="font-medium">{{ r.title }}</td>
+          <td data-label="Patient">{{ r.patient.full_name }}<span class="block text-xs text-slate-400">{{ r.patient.patient_code }}</span></td>
+          <td data-label="Service" class="text-sm">{{ r.service.name if r.service else '—' }}</td>
+          <td data-label="Date">{{ fmt_date(r.report_date) }}</td>
+          <td data-label="Status"><span class="badge {{ 'bg-emerald-50 text-emerald-700' if r.status == 'completed' else 'bg-amber-50 text-amber-700' }}">{{ r.status|capitalize }}</span></td>
+          <td data-label=" " class="text-right"><a href="{{ url_for('reports.detail', report_id=r.id) }}" class="text-xs font-semibold text-brand-700 hover:underline" onclick="event.stopPropagation()">Open &rarr;</a></td>
         </tr>
         {% else %}
         <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-400">No reports found.</td></tr>
